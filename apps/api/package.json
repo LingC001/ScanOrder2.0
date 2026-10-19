@@ -1,0 +1,36 @@
+{
+  "name": "@scanorder/api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "pnpm build && concurrently -k \"tsc -p tsconfig.build.json --watch --preserveWatchOutput\" \"node --watch dist/main.js\"",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test:compile": "tsc -p tsconfig.test.json",
+    "test": "pnpm test:compile && node --test .test-dist/test/unit.test.js",
+    "db:migrate": "pnpm build && node dist/database/cli.js migrate",
+    "db:revert": "pnpm build && node dist/database/cli.js revert",
+    "data:import": "pnpm build && node dist/import/cli.js"
+  },
+  "dependencies": {
+    "@scanorder/contracts": "workspace:*",
+    "@nestjs/common": "12.2.0",
+    "@nestjs/core": "12.2.0",
+    "@nestjs/platform-express": "12.2.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "dotenv": "^17.2.3",
+    "file-type": "^21.1.1",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "typeorm": "1.1.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/multer": "^2.0.0",
+    "@types/pg": "^8.15.6"
+  }
+}

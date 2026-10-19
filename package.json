@@ -1,0 +1,40 @@
+{
+  "name": "scanorder",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "pnpm@11.5.1",
+  "engines": {
+    "node": ">=24.15.0 <25"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @scanorder/contracts build && concurrently -k -n 类型,前端,后端 \"pnpm --filter @scanorder/contracts dev\" \"pnpm --filter @scanorder/web dev\" \"pnpm --filter @scanorder/api dev\"",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm --filter @scanorder/contracts build && pnpm -r typecheck && tsc -p tsconfig.json --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "pnpm --filter @scanorder/contracts build && pnpm -r test",
+    "test:integration": "pnpm build && pnpm --filter @scanorder/api test:compile && node scripts/with-postgres.mjs integration",
+    "test:e2e": "pnpm build && node scripts/with-postgres.mjs e2e",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:local": "node scripts/local-postgres.mjs",
+    "db:migrate": "pnpm --filter @scanorder/api db:migrate",
+    "db:revert": "pnpm --filter @scanorder/api db:revert",
+    "data:import": "pnpm --filter @scanorder/api data:import"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^24.10.0",
+    "concurrently": "^9.2.1",
+    "embedded-postgres": "18.4.0-beta.17",
+    "eslint": "^9.39.0",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.6.2",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.0"
+  }
+}

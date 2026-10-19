@@ -1,0 +1,29 @@
+[
+  {
+    "_id": { "$oid": "64a000000000000000000001" },
+    "category": "纸巾",
+    "name": "餐巾纸",
+    "price": 1,
+    "description": "柔软舒适，一包",
+    "image": "http://原服务/images/纸巾.png",
+    "recommended": false
+  },
+  {
+    "_id": { "$oid": "64a000000000000000000002" },
+    "category": "招牌海鲜",
+    "name": "香辣花甲",
+    "price": 28,
+    "description": "鲜香入味，现炒花甲",
+    "image": "http://原服务/images/花甲.png",
+    "recommended": true
+  },
+  {
+    "_id": { "$oid": "64a000000000000000000003" },
+    "category": "特色小食",
+    "name": "招牌鸡爪",
+    "price": 36,
+    "description": "软糯脱骨，香辣可口",
+    "image": "http://原服务/images/鸡爪.png",
+    "recommended": true
+  }
+]
