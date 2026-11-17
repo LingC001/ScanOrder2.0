@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { config as loadEnv } from 'dotenv';
 
-function findRoot(): string {
+function findWorkspaceRoot(): string {
   let current = dirname(fileURLToPath(import.meta.url));
   while (!existsSync(resolve(current, 'pnpm-workspace.yaml'))) {
     const parent = dirname(current);
@@ -13,17 +13,25 @@ function findRoot(): string {
   return current;
 }
 
-export const workspaceRoot = findRoot();
-loadEnv({ path: resolve(workspaceRoot, '.env'), quiet: true });
+export const workspaceRoot = findWorkspaceRoot();
 
 export interface AppConfig {
-  databaseUrl: string;
-  uploadDir: string;
-  port: number;
-  host: string;
+  readonly databaseUrl: string;
+  readonly uploadDir: string;
+  readonly port: number;
+  readonly host: string;
+}
+
+let envLoaded = false;
+
+function loadEnvironment(): void {
+  if (envLoaded) return;
+  loadEnv({ path: resolve(workspaceRoot, '.env'), quiet: true });
+  envLoaded = true;
 }
 
 export function getConfig(): AppConfig {
+  loadEnvironment();
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl || !/^postgres(?:ql)?:\/\//.test(databaseUrl)) {
     throw new Error('请在根目录 .env 中设置有效的 PostgreSQL DATABASE_URL');
@@ -32,10 +40,10 @@ export function getConfig(): AppConfig {
   if (!Number.isInteger(port) || port < 0 || port > 65535) {
     throw new Error('PORT 必须是有效端口');
   }
-  return {
+  return Object.freeze({
     databaseUrl,
     uploadDir: resolve(workspaceRoot, process.env.UPLOAD_DIR ?? './uploads'),
     port,
     host: process.env.HOST ?? '127.0.0.1',
-  };
+  });
 }

@@ -1,14 +1,15 @@
-import { createHash, randomUUID } from 'node:crypto';
-import { mkdir, readFile, realpath, stat, unlink, writeFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import { readFile, realpath, stat } from 'node:fs/promises';
 import { basename, isAbsolute, relative, resolve, sep } from 'node:path';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import type { DataSource } from 'typeorm';
 import { yuanToCents } from '@scanorder/contracts';
 import type { CreateFoodInput } from '@scanorder/contracts';
-import { FoodEntity } from '../database/entities.js';
-import { CreateFoodDto } from '../foods/food.dto.js';
-import { inspectImage, MAX_IMAGE_SIZE } from '../foods/image.js';
+import { FoodEntity } from '../foods/entities/food.entity.js';
+import { CreateFoodDto } from '../foods/dto/create-food.dto.js';
+import { ImageStorageService } from '../storage/image-storage.service.js';
+import { createImageFilename, inspectImage, MAX_IMAGE_SIZE } from '../storage/image.js';
 
 export interface PreparedFood extends CreateFoodInput {
   legacyId: string;
@@ -93,8 +94,12 @@ export async function prepareFoods(file: string, imagesDir: string): Promise<Pre
       if (!info.isFile() || info.size > MAX_IMAGE_SIZE) throw new Error('图片不是文件或超过5 MB');
       const image = await readFile(imagePath);
       const extension = await inspectImage(image);
-      const hash = createHash('sha256').update(image).digest('hex');
-      prepared.push({ ...dto, legacyId: id, image, filename: `${hash}.${extension}` });
+      prepared.push({
+        ...dto,
+        legacyId: id,
+        image,
+        filename: createImageFilename(image, extension),
+      });
     } catch (error) {
       errors.push(`第${index + 1}条：${error instanceof Error ? error.message : String(error)}`);
     }
@@ -111,22 +116,15 @@ export async function importPreparedFoods(
   uploadDir: string,
   foods: PreparedFood[],
 ): Promise<number> {
-  await mkdir(uploadDir, { recursive: true });
+  const storage = new ImageStorageService(uploadDir);
   const createdFiles: string[] = [];
   try {
     await source.transaction(async (manager) => {
       // 串行执行导入，避免同一旧记录在并发导入时被重复创建。
       await manager.query('SELECT pg_advisory_xact_lock(73110421)');
       for (const food of foods) {
-        const destination = resolve(uploadDir, food.filename);
-        try {
-          await writeFile(destination, food.image, { flag: 'wx' });
-          createdFiles.push(destination);
-        } catch (error) {
-          if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
-          const existing = await readFile(destination);
-          if (!existing.equals(food.image)) throw new Error(`目标图片内容不一致：${food.filename}`);
-        }
+        const stored = await storage.saveImported(food.image, food.filename);
+        if (stored.created) createdFiles.push(stored.filename);
         const repository = manager.getRepository(FoodEntity);
         const existing = await repository.findOneBy({ legacyId: food.legacyId });
         await repository.save(
@@ -138,7 +136,7 @@ export async function importPreparedFoods(
             description: food.description,
             priceCents: food.priceCents,
             recommended: food.recommended,
-            imageUrl: `/images/${food.filename}`,
+            imageUrl: stored.imageUrl,
           }),
         );
       }
@@ -146,11 +144,15 @@ export async function importPreparedFoods(
     return foods.length;
   } catch (error) {
     await Promise.all(
-      createdFiles.map(async (file) => {
-        const inUse = await source
-          .getRepository(FoodEntity)
-          .countBy({ imageUrl: `/images/${basename(file)}` });
-        if (!inUse) await unlink(file).catch(() => undefined);
+      createdFiles.map(async (filename) => {
+        try {
+          const inUse = await source
+            .getRepository(FoodEntity)
+            .countBy({ imageUrl: `/images/${filename}` });
+          if (!inUse) await storage.remove(filename);
+        } catch {
+          // 清理不能覆盖原始导入错误；未确认可删除时保留文件，避免误删。
+        }
       }),
     );
     throw error;

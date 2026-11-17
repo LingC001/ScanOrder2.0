@@ -5,13 +5,15 @@ import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promis
 import { resolve } from 'node:path';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import type { DataSource } from 'typeorm';
-import { workspaceRoot } from '../src/config.js';
-import { CreateFoodDto } from '../src/foods/food.dto.js';
-import { CreateOrderDto } from '../src/orders/order.dto.js';
-import { inspectImage } from '../src/foods/image.js';
+import type { Repository } from 'typeorm';
+import { workspaceRoot } from '../src/config/index.js';
+import { CreateFoodDto } from '../src/foods/dto/create-food.dto.js';
+import { FoodEntity } from '../src/foods/entities/food.entity.js';
 import { FoodsService } from '../src/foods/foods.service.js';
 import { parseExport, prepareFoods } from '../src/import/foods-importer.js';
+import { CreateOrderDto } from '../src/orders/dto/create-order.dto.js';
+import { ImageStorageService } from '../src/storage/image-storage.service.js';
+import { createImageFilename, inspectImage } from '../src/storage/image.js';
 
 async function temporary() {
   const base = resolve(workspaceRoot, '.local');
@@ -110,30 +112,48 @@ test('菜品预检支持中文图片和 Extended JSON 编号，并汇总缺图�
 test('图片写入后数据库保存失败，会清理本次上传文件', async () => {
   const directory = await temporary();
   try {
-    const source = {
-      getRepository: () => ({
-        create: (input: unknown) => input,
-        save: () => {
-          throw new Error('模拟数据库故障');
-        },
-      }),
-    } as unknown as DataSource;
-    const service = new FoodsService(source, directory);
+    const repository = {
+      create: (input: unknown) => input,
+      save: () => {
+        throw new Error('模拟数据库故障');
+      },
+    } as unknown as Repository<FoodEntity>;
+    const service = new FoodsService(repository, new ImageStorageService(directory));
     const image = await readFile(resolve(workspaceRoot, 'examples/images/纸巾.png'));
     await assert.rejects(
       service.create(
-        plainToInstance(CreateFoodDto, {
+        {
           category: '纸巾',
           name: '纸巾',
           description: '一包',
           priceCents: 100,
           recommended: false,
-        }),
-        { buffer: image } as Express.Multer.File,
+        },
+        image,
       ),
       /数据库故障/,
     );
     assert.deepEqual(await readdir(directory), []);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('导入图片按内容复用，并拒绝同名不同内容', async () => {
+  const directory = await temporary();
+  try {
+    const storage = new ImageStorageService(directory);
+    const image = await readFile(resolve(workspaceRoot, 'examples/images/纸巾.png'));
+    const other = await readFile(resolve(workspaceRoot, 'examples/images/花甲.png'));
+    const extension = await inspectImage(image);
+    const filename = createImageFilename(image, extension);
+
+    assert.equal((await storage.saveImported(image, filename)).created, true);
+    assert.equal((await storage.saveImported(image, filename)).created, false);
+
+    await storage.remove(filename);
+    await writeFile(resolve(directory, filename), other);
+    await assert.rejects(storage.saveImported(image, filename), /目标图片内容不一致/);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

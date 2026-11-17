@@ -1,6 +1,6 @@
 import { parseArgs } from 'node:util';
 import { resolve } from 'node:path';
-import { getConfig, workspaceRoot } from '../config.js';
+import { getConfig, workspaceRoot } from '../config/index.js';
 import { createDataSource } from '../database/data-source.js';
 import { importPreparedFoods, prepareFoods } from './foods-importer.js';
 
