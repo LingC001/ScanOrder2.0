@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const port = process.env.WEB_PORT ?? '4173';
-const baseURL = process.env.WEB_BASE_URL ?? `http://127.0.0.1:${port}`;
+const baseURL = process.env.WEB_BASE_URL ?? `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -21,11 +21,11 @@ export default defineConfig({
   webServer: [
     {
       command: 'node apps/api/dist/main.js',
-      url: `${process.env.API_PROXY_TARGET ?? 'http://127.0.0.1:3000'}/api/foods`,
+      url: `${process.env.API_PROXY_TARGET ?? 'http://localhost:3000'}/api/foods`,
       reuseExistingServer: false,
     },
     {
-      command: `node apps/web/node_modules/vite/bin/vite.js preview apps/web --host 127.0.0.1 --port ${port}`,
+      command: `node apps/web/node_modules/vite/bin/vite.js preview apps/web --host localhost --port ${port}`,
       url: baseURL,
       reuseExistingServer: false,
     },
