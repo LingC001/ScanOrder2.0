@@ -57,13 +57,17 @@ Vite 将 `/api` 和 `/images` 代理至后端。修改后端端口时，同时�
 
 ```text
 apps/web              React H5、页面与组件测试
-apps/api              NestJS API、数据库实体/迁移、菜品导入及接口测试
+apps/api              NestJS 模块化 API、数据库、图片存储、菜品导入及接口测试
 packages/contracts    共享业务类型、金额工具与商家信息
 scripts               本地及隔离测试 PostgreSQL 启动工具
 tests/e2e             浏览器端到端测试、三个手机宽度的页面截图
 examples              演示菜单和原项目图片素材
 docs                  重构计划、接口和迁移说明
 ```
+
+`apps/api/src` 按职责划分为 `config`、`database`、`foods`、`orders`、`storage` 和
+`import`。根模块只负责组合；菜品和订单分别拥有自己的模块、实体、DTO、映射及
+Repository，图片格式校验和本地文件读写统一由存储模块提供。
 
 商家名称、公告、地址和默认桌号集中在共享包 `SHOP` 常量中。购物车以菜品 UUID 区分同名商品，只在当前 H5 会话的内存中保留。刷新页面会重置购物车和人数，数据库中的订单不受影响。
 
