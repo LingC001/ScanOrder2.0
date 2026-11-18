@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "documents": {
+    "docs/DESIGN.md": {
+      "sources": ["apps/web/src/styles.css", "apps/web/src/components.tsx"],
+      "reviewedDigest": "3c277ddc08b5ad3ae8e15548bc0fae3287d426a92c2f3aa5404bd96b31bcdea8"
+    },
+    "docs/FRONTEND.md": {
+      "sources": ["apps/web/src/App.tsx", "apps/web/src/cart.ts", "apps/web/src/api.ts"],
+      "reviewedDigest": "a95fe0c8a967405e24760cc8c3a4e7cccbe426f140f839738dc39c16115308a6"
+    },
+    "docs/PLANS.md": {
+      "sources": [
+        "openspec/config.yaml",
+        "scripts/harness/verify.mjs",
+        "scripts/harness/settings.json",
+        "scripts/harness/workspace.mjs"
+      ],
+      "reviewedDigest": "c8edd5d2a70d8c7cb8e928865e4f5784544f1c6074bde0c61596547772515b16"
+    },
+    "docs/PRODUCT_SENSE.md": {
+      "sources": ["packages/contracts/src/index.ts", "apps/web/src/App.tsx"],
+      "reviewedDigest": "9a61d7d2b142220380af074a051e376f34838d3f4d9880c3a3015de3f77649ce"
+    },
+    "docs/QUALITY_SCORE.md": {
+      "sources": ["scripts/harness/settings.json", "tests/e2e/ordering.spec.ts"],
+      "reviewedDigest": "f0cf2e8a44325cb6133caa8d279b123ccf3b64b101f7f92b0102d2abb8a096b2"
+    },
+    "docs/RELIABILITY.md": {
+      "sources": [
+        "apps/api/src/orders/orders.service.ts",
+        "apps/api/src/app.ts",
+        "compose.yaml",
+        "scripts/harness/runtime.mjs",
+        "scripts/harness/observe.mjs",
+        "scripts/harness/runtime-worker.mjs",
+        "scripts/harness/runtime-cleanup.mjs",
+        "scripts/with-postgres.mjs",
+        "playwright.config.ts"
+      ],
+      "reviewedDigest": "2ad6775aca29724faf93ac674fbf7b7ced9dee6627754c810b67542c819f2fa0"
+    },
+    "docs/SECURITY.md": {
+      "sources": [
+        "apps/api/src/storage/image-storage.service.ts",
+        "apps/api/src/telemetry/logger.ts",
+        "scripts/harness/runtime-worker.mjs"
+      ],
+      "reviewedDigest": "66a414c14a7f89f334a06432f721f89bcd483c6ca8369d5e8b1eddde59583090"
+    },
+    "docs/design-docs/index.md": {
+      "sources": ["ARCHITECTURE.md"],
+      "reviewedDigest": "9bb50a0da17eaa3933ab03822efca13a7d73e0566ed15f3b8049952121173969"
+    },
+    "docs/design-docs/core-beliefs.md": {
+      "sources": ["AGENTS.md", "ARCHITECTURE.md"],
+      "reviewedDigest": "e510897a78245b223e6fb5867f28a51de577be30b822f319f235476810354697"
+    },
+    "docs/design-docs/runtime-observability.md": {
+      "sources": ["scripts/harness/runtime-worker.mjs", "apps/api/src/telemetry/bootstrap.ts"],
+      "reviewedDigest": "5356a9ead22cd66000ae1f4f8ebf4992877e921afeac2af1816b6797fe8f2ca1"
+    },
+    "docs/exec-plans/tech-debt-tracker.md": {
+      "sources": ["compose.yaml", "apps/api/src/app.ts"],
+      "reviewedDigest": "55a6bcd896ea6c4761b258c516b5827c11cf9cfe0e1a99f75cbf930aabbd59e9"
+    },
+    "docs/product-specs/new-user-onboarding.md": {
+      "sources": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/pages/Entry.tsx",
+        "apps/web/src/pages/SubmitOrder.tsx",
+        "tests/e2e/ordering.spec.ts"
+      ],
+      "reviewedDigest": "844882235943e5c8aeb839de0d7ca5fcb0d0eafa0e38f7f8011f91f25437447d"
+    },
+    "docs/references/design-system-reference-llms.txt": {
+      "sources": ["apps/web/src/styles.css", "apps/web/src/components.tsx"],
+      "reviewedDigest": "3c277ddc08b5ad3ae8e15548bc0fae3287d426a92c2f3aa5404bd96b31bcdea8"
+    },
+    "docs/references/stack-reference-llms.txt": {
+      "sources": [
+        "package.json",
+        "apps/api/package.json",
+        "apps/web/package.json",
+        "scripts/harness/settings.json"
+      ],
+      "reviewedDigest": "a8b570c6f94a22d0b9452d7e648166fb72dd10600bec0dc327b2dab0b0b5ce9e"
+    }
+  }
+}

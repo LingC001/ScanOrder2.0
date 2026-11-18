@@ -9,6 +9,7 @@ import { FoodEntity } from '../foods/entities/food.entity.js';
 import { OrderEntity } from './entities/order.entity.js';
 import { OrderItemEntity } from './entities/order-item.entity.js';
 import { toOrder } from './mappers/order.mapper.js';
+import { withSpan } from '../telemetry/spans.js';
 
 @Injectable()
 export class OrdersService {
@@ -18,6 +19,10 @@ export class OrdersService {
   ) {}
 
   async create(input: CreateOrderInput): Promise<Order> {
+    return withSpan('orders.create', () => this.createTransaction(input));
+  }
+
+  private async createTransaction(input: CreateOrderInput): Promise<Order> {
     const ids = input.items.map((item) => item.foodId);
     if (new Set(ids).size !== ids.length) throw new BadRequestException('同一种菜品请合并数量');
     return this.source.transaction(async (manager) => {

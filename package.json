@@ -8,6 +8,24 @@
     "node": ">=24.15.0 <25"
   },
   "scripts": {
+    "harness:prepare": "pnpm --filter @scanorder/contracts build && pnpm --filter @scanorder/api build",
+    "harness:up": "node scripts/harness/runtime.mjs up",
+    "harness:status": "node scripts/harness/runtime.mjs status",
+    "harness:down": "node scripts/harness/runtime.mjs down",
+    "harness:query": "node scripts/harness/observe.mjs",
+    "harness:eval": "pnpm build && node scripts/harness/evaluate.mjs && node scripts/harness/failure-evaluate.mjs",
+    "harness:workspace": "node scripts/harness/workspace.mjs",
+    "docs:generate": "pnpm harness:prepare && node scripts/harness/generate-docs.mjs write",
+    "check:generated": "node scripts/harness/generate-docs.mjs check",
+    "check:knowledge": "node scripts/harness/knowledge.mjs check",
+    "docs:ack": "node scripts/harness/knowledge.mjs acknowledge",
+    "harness:doctor": "node scripts/harness/doctor.mjs",
+    "check:docs": "node scripts/harness/check-docs.mjs",
+    "check:architecture": "node scripts/harness/check-architecture.mjs",
+    "check:spec": "node scripts/harness/check-spec.mjs",
+    "test:harness": "node --test tests/harness/*.test.mjs",
+    "verify": "node scripts/harness/verify.mjs base",
+    "verify:full": "node scripts/harness/verify.mjs full",
     "dev": "pnpm --filter @scanorder/contracts build && concurrently -k -n 类型,前端,后端 \"pnpm --filter @scanorder/contracts dev\" \"pnpm --filter @scanorder/web dev\" \"pnpm --filter @scanorder/api dev\"",
     "build": "pnpm -r build",
     "typecheck": "pnpm --filter @scanorder/contracts build && pnpm -r typecheck && tsc -p tsconfig.json --noEmit",
@@ -26,6 +44,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
+    "@fission-ai/openspec": "2.1.0",
     "@playwright/test": "^1.56.0",
     "@types/node": "^24.10.0",
     "concurrently": "^9.2.1",
@@ -33,8 +52,10 @@
     "eslint": "^9.39.0",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^16.5.0",
+    "marked": "18.2.1",
     "prettier": "^3.6.2",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.0"
+    "typescript-eslint": "^8.46.0",
+    "yaml": "2.9.1"
   }
 }

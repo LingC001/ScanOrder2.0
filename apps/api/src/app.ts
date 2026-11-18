@@ -7,6 +7,8 @@ import { AppModule } from './app.module.js';
 import { getConfig } from './config/index.js';
 import type { AppConfig } from './config/index.js';
 import { createDataSource } from './database/data-source.js';
+import { JsonLogger } from './telemetry/logger.js';
+import { harnessHttp } from './telemetry/http.js';
 
 export interface CreateApplicationOptions {
   config?: AppConfig;
@@ -52,7 +54,7 @@ export async function createApplication(
   try {
     await mkdir(config.uploadDir, { recursive: true });
     app = await NestFactory.create<NestExpressApplication>(AppModule.register({ config, source }), {
-      logger: options.silent ? false : ['error', 'warn', 'log'],
+      logger: options.silent ? false : new JsonLogger(),
       abortOnError: false,
     });
     app.setGlobalPrefix('api');
@@ -60,6 +62,7 @@ export async function createApplication(
       new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
     );
     app.useStaticAssets(config.uploadDir, { prefix: '/images/', dotfiles: 'deny', index: false });
+    if (process.env.HARNESS_INSTANCE_ID) app.use(harnessHttp(source));
     await app.init();
     app.enableShutdownHooks();
     return app;

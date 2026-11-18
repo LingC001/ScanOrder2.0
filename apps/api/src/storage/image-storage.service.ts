@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { createImageFilename, inspectImage, InvalidImageError } from './image.js';
+import { withSpan } from '../telemetry/spans.js';
 
 export interface StoredImage {
   filename: string;
@@ -24,6 +25,10 @@ export class ImageStorageService {
   constructor(private readonly uploadDir: string) {}
 
   async saveUpload(buffer: Uint8Array): Promise<StoredImage> {
+    return withSpan('storage.saveUpload', () => this.writeUpload(buffer));
+  }
+
+  private async writeUpload(buffer: Uint8Array): Promise<StoredImage> {
     const extension = await inspectImage(buffer);
     const filename = `${randomUUID()}.${extension}`;
     await mkdir(this.uploadDir, { recursive: true });

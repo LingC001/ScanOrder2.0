@@ -1,0 +1,44 @@
+{
+  "uid": "scanorder-harness",
+  "title": "ScanOrder 隔离实例诊断",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "HTTP 请求计数",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "METRICS_UID" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (http_route, http_response_status_code) (scanorder_http_requests_total)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "HTTP 请求 P95 耗时",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "METRICS_UID" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le, http_route) (rate(scanorder_http_duration_seconds_bucket[5m])))"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "关联日志",
+      "type": "logs",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 8 },
+      "datasource": { "type": "loki", "uid": "LOGS_UID" },
+      "targets": [{ "refId": "A", "expr": "{service_name=\"scanorder-api\"}" }]
+    }
+  ]
+}
