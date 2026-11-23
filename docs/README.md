@@ -4,6 +4,7 @@
 
 - [架构地图](../ARCHITECTURE.md)
 - [安装、运行与命令](../README.md)
+- [常见修改入口](开发指南.md)
 - [DESIGN](DESIGN.md)
 - [FRONTEND](FRONTEND.md)
 - [PLANS](PLANS.md)
@@ -19,11 +20,3 @@
 - [数据库结构](generated/db-schema.md)
 - [技术参考](references/stack-reference-llms.txt)
 - [设计系统参考](references/design-system-reference-llms.txt)
-
-## 开发参考
-
-- [开发指南](开发指南.md)
-- [架构说明](架构说明.md)
-- [测试指南](测试指南.md)
-- [实施计划起草模板](plans/README.md)
-- [技术决策记录模板](decisions/README.md)
