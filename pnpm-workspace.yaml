@@ -12,8 +12,12 @@ allowBuilds:
   '@tailwindcss/oxide': true
   embedded-postgres: true
   esbuild: true
+  # postinstall 仅检查依赖版本约定，不下载或生成二进制。
+  protobufjs: true
 
 minimumReleaseAgeExclude:
   - '@nestjs/common@12.2.0'
   - '@nestjs/core@12.2.0'
   - '@nestjs/platform-express@12.2.0'
+  - '@fission-ai/openspec@2.1.0'
+  - marked@18.2.1

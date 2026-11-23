@@ -1,44 +1,29 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'node:crypto';
-import { DataSource, In } from 'typeorm';
 import { SHOP } from '@scanorder/contracts';
-import type { Order } from '@scanorder/contracts';
-import { DATABASE } from '../database/data-source.js';
-import { FoodEntity, OrderEntity, OrderItemEntity } from '../database/entities.js';
-import type { CreateOrderDto } from './order.dto.js';
-
-export function toOrder(order: OrderEntity): Order {
-  return {
-    id: order.id,
-    location: order.location,
-    tableNumber: order.tableNumber,
-    guestCount: order.guestCount,
-    comment: order.comment,
-    totalAmountCents: order.totalAmountCents,
-    totalQuantity: order.totalQuantity,
-    finished: order.finished,
-    createdAt: order.createdAt.toISOString(),
-    updatedAt: order.updatedAt.toISOString(),
-    items: [...order.items]
-      .sort((a, b) => a.position - b.position)
-      .map((item) => ({
-        id: item.id,
-        foodId: item.foodId,
-        name: item.name,
-        imageUrl: item.imageUrl,
-        priceCents: item.priceCents,
-        quantity: item.quantity,
-        totalAmountCents: item.totalAmountCents,
-      })),
-  };
-}
+import type { CreateOrderInput, Order } from '@scanorder/contracts';
+import { DataSource, In } from 'typeorm';
+import type { Repository } from 'typeorm';
+import { FoodEntity } from '../foods/entities/food.entity.js';
+import { OrderEntity } from './entities/order.entity.js';
+import { OrderItemEntity } from './entities/order-item.entity.js';
+import { toOrder } from './mappers/order.mapper.js';
+import { withSpan } from '../telemetry/spans.js';
 
 @Injectable()
 export class OrdersService {
-  constructor(@Inject(DATABASE) private readonly source: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly source: DataSource,
+    @InjectRepository(OrderEntity) private readonly orders: Repository<OrderEntity>,
+  ) {}
 
-  async create(dto: CreateOrderDto): Promise<Order> {
-    const ids = dto.items.map((item) => item.foodId);
+  async create(input: CreateOrderInput): Promise<Order> {
+    return withSpan('orders.create', () => this.createTransaction(input));
+  }
+
+  private async createTransaction(input: CreateOrderInput): Promise<Order> {
+    const ids = input.items.map((item) => item.foodId);
     if (new Set(ids).size !== ids.length) throw new BadRequestException('同一种菜品请合并数量');
     return this.source.transaction(async (manager) => {
       const foods = await manager.find(FoodEntity, { where: { id: In(ids) } });
@@ -46,7 +31,7 @@ export class OrdersService {
       if (foods.length !== ids.length)
         throw new BadRequestException('部分菜品不存在，请返回菜单重新选择');
       const id = randomUUID();
-      const items = dto.items.map((line, position) => {
+      const items = input.items.map((line, position) => {
         const food = foodMap.get(line.foodId)!;
         return manager.create(OrderItemEntity, {
           id: randomUUID(),
@@ -66,9 +51,9 @@ export class OrdersService {
       const order = manager.create(OrderEntity, {
         id,
         location: SHOP.name,
-        tableNumber: dto.tableNumber.trim(),
-        guestCount: dto.guestCount,
-        comment: dto.comment,
+        tableNumber: input.tableNumber.trim(),
+        guestCount: input.guestCount,
+        comment: input.comment,
         finished: true,
         items,
         totalAmountCents,
@@ -82,16 +67,15 @@ export class OrdersService {
   }
 
   async list(): Promise<Order[]> {
-    const orders = await this.source
-      .getRepository(OrderEntity)
-      .find({ relations: { items: true }, order: { createdAt: 'DESC', id: 'DESC' } });
+    const orders = await this.orders.find({
+      relations: { items: true },
+      order: { createdAt: 'DESC', id: 'DESC' },
+    });
     return orders.map(toOrder);
   }
 
   async detail(id: string): Promise<Order> {
-    const order = await this.source
-      .getRepository(OrderEntity)
-      .findOne({ where: { id }, relations: { items: true } });
+    const order = await this.orders.findOne({ where: { id }, relations: { items: true } });
     if (!order) throw new NotFoundException('订单不存在');
     return toOrder(order);
   }

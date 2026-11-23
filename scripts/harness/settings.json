@@ -1,0 +1,17 @@
+{
+  "image": "grafana/otel-lgtm@sha256:2e3290657f2f2a256c7a9175f097424a3ac5b54840741ace433e108e109348b6",
+  "imageVersion": "0.41.0",
+  "containerMemory": "2g",
+  "containerCpus": "2",
+  "startupTimeoutMs": 150000,
+  "telemetryTimeoutMs": 90000,
+  "fileLimits": { "business": 300, "tool": 500 },
+  "maintenance": {
+    "maxIssues": 1,
+    "maxRepairRounds": 2,
+    "maxMinutes": 30,
+    "publication": "local-patch",
+    "timezone": "Asia/Shanghai",
+    "schedule": "工作日09:00"
+  }
+}

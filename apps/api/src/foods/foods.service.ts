@@ -1,65 +1,53 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'node:crypto';
-import { mkdir, unlink, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { DataSource } from 'typeorm';
-import type { Food } from '@scanorder/contracts';
-import { DATABASE } from '../database/data-source.js';
-import { FoodEntity } from '../database/entities.js';
-import type { CreateFoodDto } from './food.dto.js';
-import { inspectImage } from './image.js';
-
-export const UPLOAD_DIRECTORY = Symbol('图片保存目录');
-
-export function toFood(food: FoodEntity): Food {
-  return {
-    id: food.id,
-    category: food.category,
-    name: food.name,
-    priceCents: food.priceCents,
-    description: food.description,
-    imageUrl: food.imageUrl,
-    recommended: food.recommended,
-  };
-}
+import type { CreateFoodInput, Food } from '@scanorder/contracts';
+import type { Repository } from 'typeorm';
+import { ImageStorageService } from '../storage/image-storage.service.js';
+import { InvalidImageError } from '../storage/image.js';
+import { FoodEntity } from './entities/food.entity.js';
+import { toFood } from './mappers/food.mapper.js';
 
 @Injectable()
 export class FoodsService {
+  private readonly logger = new Logger(FoodsService.name);
+
   constructor(
-    @Inject(DATABASE) private readonly source: DataSource,
-    @Inject(UPLOAD_DIRECTORY) private readonly uploadDir: string,
+    @InjectRepository(FoodEntity) private readonly foods: Repository<FoodEntity>,
+    private readonly storage: ImageStorageService,
   ) {}
 
   async list(): Promise<Food[]> {
-    const foods = await this.source
-      .getRepository(FoodEntity)
-      .find({ order: { createdAt: 'ASC', id: 'ASC' } });
+    const foods = await this.foods.find({ order: { createdAt: 'ASC', id: 'ASC' } });
     return foods.map(toFood);
   }
 
-  async create(dto: CreateFoodDto, file?: Express.Multer.File): Promise<Food> {
-    if (!file) throw new BadRequestException('请选择菜品图片');
-    let extension: string;
+  async create(input: CreateFoodInput, buffer?: Uint8Array): Promise<Food> {
+    if (!buffer) throw new BadRequestException('请选择菜品图片');
+
+    let stored;
     try {
-      extension = await inspectImage(file.buffer);
+      stored = await this.storage.saveUpload(buffer);
     } catch (error) {
-      throw new BadRequestException((error as Error).message);
+      if (error instanceof InvalidImageError) throw new BadRequestException(error.message);
+      throw error;
     }
-    await mkdir(this.uploadDir, { recursive: true });
-    const filename = `${randomUUID()}.${extension}`;
-    const destination = join(this.uploadDir, filename);
-    await writeFile(destination, file.buffer, { flag: 'wx' });
+
     try {
-      const repository = this.source.getRepository(FoodEntity);
-      const food = repository.create({
-        ...dto,
+      const food = this.foods.create({
+        ...input,
         id: randomUUID(),
         legacyId: null,
-        imageUrl: `/images/${filename}`,
+        imageUrl: stored.imageUrl,
       });
-      return toFood(await repository.save(food));
+      return toFood(await this.foods.save(food));
     } catch (error) {
-      await unlink(destination);
+      await this.storage.remove(stored.filename).catch((cleanupError: unknown) => {
+        this.logger.error(
+          `上传图片清理失败：${stored.filename}`,
+          cleanupError instanceof Error ? cleanupError.stack : String(cleanupError),
+        );
+      });
       throw error;
     }
   }

@@ -1,25 +1,35 @@
-import { Inject, Injectable, Module } from '@nestjs/common';
-import type { DynamicModule, OnApplicationShutdown } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import type { DynamicModule } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
-import { DATABASE } from './data-source.js';
+import { APP_CONFIG } from '../config/index.js';
+import type { AppConfig } from '../config/index.js';
+import { createDataSourceOptions } from './data-source.js';
 
-@Injectable()
-class DatabaseLifecycle implements OnApplicationShutdown {
-  constructor(@Inject(DATABASE) private readonly source: DataSource) {}
-
-  async onApplicationShutdown() {
-    if (this.source.isInitialized) await this.source.destroy();
-  }
+interface DatabaseModuleOptions {
+  source?: DataSource;
 }
 
 @Module({})
 export class DatabaseModule {
-  static forRoot(source: DataSource): DynamicModule {
+  static register(options: DatabaseModuleOptions = {}): DynamicModule {
     return {
       module: DatabaseModule,
-      global: true,
-      providers: [{ provide: DATABASE, useValue: source }, DatabaseLifecycle],
-      exports: [DATABASE],
+      imports: [
+        TypeOrmModule.forRootAsync({
+          inject: [APP_CONFIG],
+          useFactory: (config: AppConfig) => ({
+            ...createDataSourceOptions(config.databaseUrl),
+            retryAttempts: 1,
+          }),
+          ...(options.source
+            ? {
+                dataSourceFactory: async () => options.source!,
+              }
+            : {}),
+        }),
+      ],
+      exports: [TypeOrmModule],
     };
   }
 }

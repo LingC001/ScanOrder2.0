@@ -1,0 +1,159 @@
+name: 工程验证
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: harness-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: 'true'
+  OPENSPEC_TELEMETRY: '0'
+
+jobs:
+  observability:
+    name: 隔离运行与遥测验收
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.5.1
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: node scripts/harness/verify.mjs observability
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: harness-observability
+          path: |
+            .local/harness/*.json
+            .local/harness/*.md
+            .local/harness/*.log
+            .local/harness/evaluations/
+          include-hidden-files: true
+          if-no-files-found: warn
+  quality:
+    name: 基础验证（${{ matrix.os }}）
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v7
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.5.1
+          run_install: false
+      - name: 配置 Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+      - name: 安装锁定依赖
+        run: pnpm install --frozen-lockfile
+      - name: 执行基础验证
+        run: pnpm verify
+      - name: 保存验证日志和报告
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: harness-${{ matrix.os }}
+          path: |
+            .local/harness/*.json
+            .local/harness/*.md
+            .local/harness/*.log
+            .local/harness/evaluations/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+
+  integration:
+    name: 真实 PostgreSQL 集成测试
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v7
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.5.1
+          run_install: false
+      - name: 配置 Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+      - name: 安装锁定依赖
+        run: pnpm install --frozen-lockfile
+      - name: 执行隔离数据库测试
+        run: node scripts/harness/verify.mjs integration
+      - name: 保存验证日志和报告
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: harness-integration
+          path: |
+            .local/harness/*.json
+            .local/harness/*.md
+            .local/harness/*.log
+            .local/harness/evaluations/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+
+  e2e:
+    name: Chromium 业务回归
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v7
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.5.1
+          run_install: false
+      - name: 配置 Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+      - name: 安装锁定依赖
+        run: pnpm install --frozen-lockfile
+      - name: 安装 Chromium 与系统依赖
+        run: pnpm exec playwright install --with-deps chromium
+      - name: 执行隔离浏览器测试
+        run: node scripts/harness/verify.mjs e2e
+      - name: 保存浏览器证据和验证日志
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: harness-e2e
+          path: |
+            .local/harness/*.json
+            .local/harness/*.md
+            .local/harness/*.log
+            .local/harness/evaluations/
+            playwright-report/
+            test-results/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14

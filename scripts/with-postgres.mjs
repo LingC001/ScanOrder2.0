@@ -15,9 +15,9 @@ Object.assign(process.env, {
   UPLOAD_DIR: resolve(directory, 'uploads'),
   PORT: String(apiPort),
   HOST: '127.0.0.1',
-  API_PROXY_TARGET: `http://127.0.0.1:${apiPort}`,
+  API_PROXY_TARGET: `http://localhost:${apiPort}`,
   WEB_PORT: String(webPort),
-  WEB_BASE_URL: `http://127.0.0.1:${webPort}`,
+  WEB_BASE_URL: `http://localhost:${webPort}`,
 });
 
 try {

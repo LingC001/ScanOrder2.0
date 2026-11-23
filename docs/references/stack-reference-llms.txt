@@ -1,0 +1,15 @@
+# 技术参考索引
+
+技术参考来自当前工作区清单及官方文档，不引入本项目未使用的部署或语言工具。
+
+- Node.js 24：https://nodejs.org/docs/latest-v24.x/api/
+- pnpm 11：https://pnpm.io/
+- React：https://react.dev/
+- NestJS：https://docs.nestjs.com/
+- TypeORM：https://typeorm.io/
+- PostgreSQL 18：https://www.postgresql.org/docs/18/
+- Playwright：https://playwright.dev/docs/intro
+- OpenTelemetry：https://opentelemetry.io/docs/languages/js/
+- LGTM 开发后端：https://github.com/grafana/docker-otel-lgtm
+
+实际依赖版本以 package.json 与锁文件为准；镜像版本和摘要见 scripts/harness/settings.json。升级时检查兼容性并重新验收。

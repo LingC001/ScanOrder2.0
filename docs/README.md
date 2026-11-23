@@ -1,27 +1,29 @@
-# 文档导航
+# 项目知识索引
 
-首次运行项目见 [项目 README](../README.md)，协作规则见 [AGENTS.md](../AGENTS.md)。本目录按需补充文档，不要求每次小改动都新建计划。
+从根指引进入，按任务读取相关知识。正式规范和计划仅在 OpenSpec 维护，产品视图及计划导航由生成器生成。
 
-## 当前说明
+- [架构地图](../ARCHITECTURE.md)
+- [安装、运行与命令](../README.md)
+- [DESIGN](DESIGN.md)
+- [FRONTEND](FRONTEND.md)
+- [PLANS](PLANS.md)
+- [PRODUCT_SENSE](PRODUCT_SENSE.md)
+- [QUALITY_SCORE](QUALITY_SCORE.md)
+- [RELIABILITY](RELIABILITY.md)
+- [SECURITY](SECURITY.md)
+- [设计索引](design-docs/index.md)
+- [产品行为](product-specs/index.md)
+- [活动计划](exec-plans/active/index.md)
+- [完成计划](exec-plans/completed/index.md)
+- [技术债](exec-plans/tech-debt-tracker.md)
+- [数据库结构](generated/db-schema.md)
+- [技术参考](references/stack-reference-llms.txt)
+- [设计系统参考](references/design-system-reference-llms.txt)
 
-| 文档                    | 用途                                 |
-| ----------------------- | ------------------------------------ |
-| [架构说明](架构说明.md) | 模块职责、依赖方向和核心数据流       |
-| [开发指南](开发指南.md) | 本地开发入口、常见修改位置和配置约定 |
-| [测试指南](测试指南.md) | 检查命令、测试分层和验证记录要求     |
-| [接口说明](接口说明.md) | 菜品、订单、图片上传及错误响应       |
-| [迁移说明](迁移说明.md) | 旧菜品 JSON 与图片的预检和导入       |
+## 开发参考
 
-## 计划与决策
-
-- [实施计划](plans/README.md)：跨模块或分阶段任务，附可复制模板。
-- [技术决策](decisions/README.md)：需要长期保留的方案取舍，附 ADR 模板。
-
-## 历史记录
-
-- [重构计划](重构计划.md)：原始重构范围和方案。
-- [验收结果](验收结果.md)：2026 年 10 月 20 日的验收快照，不代表后续版本已通过检查。
-
-## 维护约定
-
-运行步骤以根 README 为入口，接口细节集中在接口说明中，避免重复维护。新增文档后更新本导航；文档中的仓库路径使用相对链接。计划明确区分待办与已完成，验证结果记录实际日期、命令、结果和限制，不将模板内容视为已完成工作。
+- [开发指南](开发指南.md)
+- [架构说明](架构说明.md)
+- [测试指南](测试指南.md)
+- [实施计划起草模板](plans/README.md)
+- [技术决策记录模板](decisions/README.md)

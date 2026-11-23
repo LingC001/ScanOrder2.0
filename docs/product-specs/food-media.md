@@ -1,0 +1,29 @@
+# food-media 产品行为
+
+生成阅读视图，修改应回到 [OpenSpec 来源](../../openspec/specs/food-media/spec.md)。
+
+# food-media 规范
+
+## Purpose
+
+记录当前新增菜品、上传图片与原始菜品文件导入的行为边界，为自动化维护提供有效输入、失败和事务约束，确保导入工具仅处理明确提供的菜单及图片并保持重复运行的幂等性。
+
+## Requirements
+
+### Requirement: 图片上传校验
+
+服务端 SHALL 识别真实 JPEG、PNG、WebP，限制单张五 MB，并在保存失败时清理本次新建文件。
+
+#### Scenario: 伪装图片
+
+- **WHEN** 上传文本作为图片
+- **THEN** 请求被拒绝且不新增菜品
+
+### Requirement: 导入幂等与预检
+
+导入工具 SHALL 预检全部输入，支持只读预检，并按旧编号更新同一菜品，不迁移历史订单。
+
+#### Scenario: 重复导入
+
+- **WHEN** 对相同有效菜单和图片执行两次导入
+- **THEN** 菜品 UUID 保持不变且数量不增重

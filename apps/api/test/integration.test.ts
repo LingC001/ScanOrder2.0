@@ -2,16 +2,19 @@ import 'reflect-metadata';
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { readdir, readFile } from 'node:fs/promises';
+import { mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { createServer } from 'node:net';
 import { resolve } from 'node:path';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { DataSource } from 'typeorm';
 import type { Food, Order } from '@scanorder/contracts';
-import { createApplication } from '../src/app.js';
-import { getConfig, workspaceRoot } from '../src/config.js';
+import { createApplication, startApplication } from '../src/app.js';
+import { getConfig, workspaceRoot } from '../src/config/index.js';
 import { createDataSource } from '../src/database/data-source.js';
-import { FoodEntity, OrderEntity, OrderItemEntity } from '../src/database/entities.js';
+import { FoodEntity } from '../src/foods/entities/food.entity.js';
 import { importPreparedFoods, prepareFoods } from '../src/import/foods-importer.js';
+import { OrderEntity } from '../src/orders/entities/order.entity.js';
+import { OrderItemEntity } from '../src/orders/entities/order-item.entity.js';
 
 let source: DataSource;
 let app: NestExpressApplication;
@@ -29,8 +32,10 @@ before(async () => {
   base = await app.getUrl();
 });
 after(async () => {
-  if (app) await app.close();
-  else if (source?.isInitialized) await source.destroy();
+  if (app) {
+    await app.close();
+    assert.equal(source.isInitialized, false, '关闭应用后应释放数据库连接');
+  } else if (source?.isInitialized) await source.destroy();
 });
 
 test('PostgreSQL 菜品导入幂等，图片可访问，历史订单保持为空', async () => {
@@ -190,4 +195,90 @@ test('大于32位整数的订单总价仍保持准确', async () => {
   assert.equal(response.status, 201);
   const order = (await response.json()) as Order;
   assert.equal(order.totalAmountCents, 9_990_000_000);
+});
+
+test('应用创建失败时释放外部数据源', async () => {
+  const directory = await mkdtemp(resolve(workspaceRoot, '.local/integration-lifecycle-'));
+  const uploadFile = resolve(directory, 'not-a-directory');
+  await writeFile(uploadFile, 'occupied');
+  const external = await createDataSource().initialize();
+  try {
+    await assert.rejects(
+      createApplication({
+        config: { ...config, uploadDir: uploadFile },
+        source: external,
+        silent: true,
+      }),
+    );
+    assert.equal(external.isInitialized, false);
+  } finally {
+    if (external.isInitialized) await external.destroy();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('Nest 模块初始化失败时释放外部数据源', async () => {
+  const directory = await mkdtemp(resolve(workspaceRoot, '.local/integration-module-'));
+  let initialized = true;
+  const external = {
+    get isInitialized() {
+      return initialized;
+    },
+    options: { type: 'postgres' },
+    entityMetadatas: [],
+    manager: {},
+    getRepository: () => {
+      throw new Error('模拟模块初始化故障');
+    },
+    destroy: async () => {
+      initialized = false;
+    },
+  } as unknown as DataSource;
+  try {
+    await assert.rejects(
+      createApplication({
+        config: { ...config, uploadDir: directory },
+        source: external,
+        silent: true,
+      }),
+      /模拟模块初始化故障/,
+    );
+    assert.equal(external.isInitialized, false);
+  } finally {
+    if (external.isInitialized) await external.destroy();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('监听端口失败时关闭应用并释放外部数据源', async () => {
+  const directory = await mkdtemp(resolve(workspaceRoot, '.local/integration-listen-'));
+  const blocker = createServer();
+  await new Promise<void>((accept, reject) => {
+    blocker.once('error', reject);
+    blocker.listen(0, '127.0.0.1', accept);
+  });
+  const address = blocker.address();
+  assert.ok(address && typeof address === 'object');
+  const external = await createDataSource().initialize();
+  try {
+    await assert.rejects(
+      startApplication({
+        config: {
+          ...config,
+          host: '127.0.0.1',
+          port: address.port,
+          uploadDir: resolve(directory, 'uploads'),
+        },
+        source: external,
+        silent: true,
+      }),
+    );
+    assert.equal(external.isInitialized, false);
+  } finally {
+    if (external.isInitialized) await external.destroy();
+    await new Promise<void>((accept, reject) => {
+      blocker.close((error) => (error ? reject(error) : accept()));
+    });
+    await rm(directory, { recursive: true, force: true });
+  }
 });

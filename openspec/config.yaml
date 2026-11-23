@@ -1,0 +1,27 @@
+schema: spec-driven
+context: |
+  所有制品正文使用简体中文；保留 OpenSpec 的结构标题、SHALL/MUST、WHEN/THEN 等机器标记。
+  当前项目为 ScanOrder 扫码点餐 H5，使用 pnpm monorepo、React、NestJS、TypeORM 和 PostgreSQL。
+  apps/web 与 apps/api 通过 HTTP 通信，共享纯业务类型和金额工具位于 packages/contracts。
+  当前代码与工程约定入口为 AGENTS.md、ARCHITECTURE.md 和 docs/README.md。
+  金额使用整数分，订单总价由服务端计算，订单明细保留快照；数据库使用显式迁移。
+  本地浏览器访问 localhost；真实数据库测试使用独立临时实例。
+  技能优先读取项目 .agents/skills；用户已明确授权的范围可直接承接。
+rules:
+  proposal:
+    - 说明问题、可观察结果、受影响能力及范围；先检查正式规范，避免重复能力。
+  specs:
+    - 描述可观察行为与可验收场景，不把内部符号和实施步骤写成行为要求。
+  design:
+    - 结合当前代码说明方案、依赖、兼容性、风险及验证方法，解决影响实施的关键疑问。
+  tasks:
+    - 按依赖拆分可完成的任务，每项标注验证方法，相关测试与文档随对应实现完成。
+operations:
+  apply:
+    guidance:
+      - 保留用户已有修改，按已授权方案及任务依赖实施。
+      - 普通前端小改动按需验证；按计划执行或大型任务完成相关检查；设计稿还原使用内置浏览器视觉校验。
+      - 必要检查读取到结束及退出码，明确报告未执行项目。
+  archive:
+    guidance:
+      - 核对任务完成与验收证据，明确区分本地检查和远端 CI；未完成任务不标记完成。
