@@ -44,12 +44,16 @@
   }
   #root {
     width: 100%;
+    min-height: 100dvh;
+  }
+  .customer-root {
+    position: relative;
+    width: 100%;
     max-width: 480px;
     height: 100dvh;
     margin: 0 auto;
-    background: white;
     overflow: hidden;
-    position: relative;
+    background: white;
   }
 }
 
@@ -199,5 +203,37 @@
   }
   .upload-picker {
     @apply cursor-pointer;
+  }
+  .admin-primary-button {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 disabled:bg-slate-300;
+  }
+  .admin-secondary-button {
+    @apply inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-default disabled:opacity-40;
+  }
+  .admin-danger-button {
+    @apply inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 hover:bg-red-100;
+  }
+  .admin-field {
+    @apply mb-4 block text-sm font-medium text-slate-700;
+  }
+  .admin-field > span {
+    @apply mb-2 block;
+  }
+  .admin-field input,
+  .admin-field select,
+  .admin-field textarea {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal text-slate-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100;
+  }
+  .admin-card {
+    @apply overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm;
+  }
+  .admin-table {
+    @apply w-full border-collapse text-left text-sm;
+  }
+  .admin-table th {
+    @apply border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs font-medium text-slate-500;
+  }
+  .admin-table td {
+    @apply border-b border-slate-100 px-4 py-3 align-middle text-slate-700;
   }
 }

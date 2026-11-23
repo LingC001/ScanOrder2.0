@@ -2,29 +2,54 @@
   "version": 1,
   "documents": {
     "docs/DESIGN.md": {
-      "sources": ["apps/web/src/styles.css", "apps/web/src/components.tsx"],
-      "reviewedDigest": "3c277ddc08b5ad3ae8e15548bc0fae3287d426a92c2f3aa5404bd96b31bcdea8"
+      "sources": [
+        "apps/web/src/styles.css",
+        "apps/web/src/components.tsx",
+        "apps/web/src/pages/admin/AdminApp.tsx",
+        "apps/web/src/pages/admin/AdminCommon.tsx"
+      ],
+      "reviewedDigest": "12b49d555772f0fa80d87fc01128a755b7f8dd3a84d684ddb08e96cbba7bbaa2"
     },
     "docs/FRONTEND.md": {
-      "sources": ["apps/web/src/App.tsx", "apps/web/src/cart.ts", "apps/web/src/api.ts"],
-      "reviewedDigest": "a95fe0c8a967405e24760cc8c3a4e7cccbe426f140f839738dc39c16115308a6"
+      "sources": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/cart.ts",
+        "apps/web/src/api.ts",
+        "apps/web/src/pages/admin/AdminFoods.tsx",
+        "apps/web/src/pages/admin/AdminCategories.tsx",
+        "apps/web/src/pages/admin/AdminOrders.tsx"
+      ],
+      "reviewedDigest": "183de244c4f5d8248ee8dd16ce9af38eea24d6279a1eac3be6e4aeafc3a9eada"
     },
     "docs/PLANS.md": {
       "sources": [
+        "AGENTS.md",
+        "package.json",
         "openspec/config.yaml",
         "scripts/harness/verify.mjs",
         "scripts/harness/settings.json",
         "scripts/harness/workspace.mjs"
       ],
-      "reviewedDigest": "c8edd5d2a70d8c7cb8e928865e4f5784544f1c6074bde0c61596547772515b16"
+      "reviewedDigest": "618967dd5d3becb5586853f6affeabc0d6ced0beaafa383e394f3a56f3883e21"
     },
     "docs/PRODUCT_SENSE.md": {
-      "sources": ["packages/contracts/src/index.ts", "apps/web/src/App.tsx"],
-      "reviewedDigest": "9a61d7d2b142220380af074a051e376f34838d3f4d9880c3a3015de3f77649ce"
+      "sources": [
+        "packages/contracts/src/index.ts",
+        "apps/web/src/App.tsx",
+        "apps/web/src/pages/admin/AdminApp.tsx"
+      ],
+      "reviewedDigest": "c2962f5c772bc11091c71d3466a80e01f3de2e606702b5bb0a98eeab47f4cfbf"
     },
     "docs/QUALITY_SCORE.md": {
-      "sources": ["scripts/harness/settings.json", "tests/e2e/ordering.spec.ts"],
-      "reviewedDigest": "f0cf2e8a44325cb6133caa8d279b123ccf3b64b101f7f92b0102d2abb8a096b2"
+      "sources": [
+        ".github/workflows/harness.yml",
+        "apps/api/test/integration.test.ts",
+        "apps/api/test/unit.test.ts",
+        "openspec/changes/align-full-harness/verification.md",
+        "scripts/harness/settings.json",
+        "tests/e2e/ordering.spec.ts"
+      ],
+      "reviewedDigest": "e9bc64e393980e0d08f0145d807714604d1c624beeb999a91fea72bcc4cbac79"
     },
     "docs/RELIABILITY.md": {
       "sources": [
@@ -38,44 +63,51 @@
         "scripts/with-postgres.mjs",
         "playwright.config.ts"
       ],
-      "reviewedDigest": "2ad6775aca29724faf93ac674fbf7b7ced9dee6627754c810b67542c819f2fa0"
+      "reviewedDigest": "bfc8729cde9626a29c5c3fdb382a98726b0e8a03c4987a0e99ce5abf5c5ddc21"
     },
     "docs/SECURITY.md": {
       "sources": [
+        "apps/api/src/auth/auth.service.ts",
+        "apps/api/src/auth/password.ts",
+        "apps/api/src/config/app-config.ts",
         "apps/api/src/storage/image-storage.service.ts",
         "apps/api/src/telemetry/logger.ts",
         "scripts/harness/runtime-worker.mjs"
       ],
-      "reviewedDigest": "66a414c14a7f89f334a06432f721f89bcd483c6ca8369d5e8b1eddde59583090"
+      "reviewedDigest": "8757461d674dcbb92e4242c9182b8b1beae8be1c7974c638a48e3c7eb8b92c43"
     },
     "docs/design-docs/index.md": {
-      "sources": ["ARCHITECTURE.md"],
-      "reviewedDigest": "9bb50a0da17eaa3933ab03822efca13a7d73e0566ed15f3b8049952121173969"
+      "sources": ["ARCHITECTURE.md", "docs/design-docs/adr-template.md"],
+      "reviewedDigest": "3357660eca6a529d1741de4e888603651b0657215a138ec2cb7d3a7645a2c4a1"
     },
     "docs/design-docs/core-beliefs.md": {
       "sources": ["AGENTS.md", "ARCHITECTURE.md"],
-      "reviewedDigest": "e510897a78245b223e6fb5867f28a51de577be30b822f319f235476810354697"
+      "reviewedDigest": "8a9a5726a2f5bb60497178eee0a9b6d9d18d8c30a47734c89c78df8f04e2a814"
     },
     "docs/design-docs/runtime-observability.md": {
       "sources": ["scripts/harness/runtime-worker.mjs", "apps/api/src/telemetry/bootstrap.ts"],
       "reviewedDigest": "5356a9ead22cd66000ae1f4f8ebf4992877e921afeac2af1816b6797fe8f2ca1"
     },
     "docs/exec-plans/tech-debt-tracker.md": {
-      "sources": ["compose.yaml", "apps/api/src/app.ts"],
-      "reviewedDigest": "55a6bcd896ea6c4761b258c516b5827c11cf9cfe0e1a99f75cbf930aabbd59e9"
+      "sources": [".env.example", "README.md", "compose.yaml", "apps/api/src/app.ts"],
+      "reviewedDigest": "e55126e75528dec22dcf1c3dcf41bd26aec328ba27a7990bfbb0a3ab8cb5bb93"
     },
     "docs/product-specs/new-user-onboarding.md": {
       "sources": [
         "apps/web/src/App.tsx",
+        "apps/web/src/cart.ts",
+        "apps/web/src/pages/Choose.tsx",
         "apps/web/src/pages/Entry.tsx",
         "apps/web/src/pages/SubmitOrder.tsx",
+        "apps/web/src/pages/admin/AdminApp.tsx",
+        "openspec/specs/food-media/spec.md",
         "tests/e2e/ordering.spec.ts"
       ],
-      "reviewedDigest": "844882235943e5c8aeb839de0d7ca5fcb0d0eafa0e38f7f8011f91f25437447d"
+      "reviewedDigest": "013df71555d60959f7578f400c8e7ae893c52cdee5df5945488da5e7731940e8"
     },
     "docs/references/design-system-reference-llms.txt": {
       "sources": ["apps/web/src/styles.css", "apps/web/src/components.tsx"],
-      "reviewedDigest": "3c277ddc08b5ad3ae8e15548bc0fae3287d426a92c2f3aa5404bd96b31bcdea8"
+      "reviewedDigest": "c3d375192e443a7b4dceb19b7ade239d19d533ecf75f1b4344fcbd6ddb358e50"
     },
     "docs/references/stack-reference-llms.txt": {
       "sources": [
@@ -85,6 +117,20 @@
         "scripts/harness/settings.json"
       ],
       "reviewedDigest": "a8b570c6f94a22d0b9452d7e648166fb72dd10600bec0dc327b2dab0b0b5ce9e"
+    },
+    "docs/开发指南.md": {
+      "sources": [
+        "apps/api/src/auth/auth.service.ts",
+        "apps/api/src/categories/categories.service.ts",
+        "apps/api/src/database/data-source.ts",
+        "apps/api/src/import/foods-importer.ts",
+        "apps/web/src/App.tsx",
+        "apps/web/src/api.ts",
+        "apps/web/src/cart.ts",
+        "packages/contracts/package.json",
+        "packages/contracts/src/index.ts"
+      ],
+      "reviewedDigest": "b9767d4653f32710b1fb1e9c60eff6ad5fddf2c1c63d791677830291f6967f2e"
     }
   }
 }

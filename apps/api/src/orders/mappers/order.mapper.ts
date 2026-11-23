@@ -4,13 +4,14 @@ import type { OrderEntity } from '../entities/order.entity.js';
 export function toOrder(order: OrderEntity): Order {
   return {
     id: order.id,
+    customerId: order.customerId,
     location: order.location,
     tableNumber: order.tableNumber,
     guestCount: order.guestCount,
     comment: order.comment,
     totalAmountCents: order.totalAmountCents,
     totalQuantity: order.totalQuantity,
-    finished: order.finished,
+    status: order.status,
     createdAt: order.createdAt.toISOString(),
     updatedAt: order.updatedAt.toISOString(),
     items: [...order.items]

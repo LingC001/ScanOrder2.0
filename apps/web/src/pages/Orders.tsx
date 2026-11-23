@@ -1,16 +1,43 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { formatMoney } from '@scanorder/contracts';
+import { formatMoney, ORDER_STATUS_LABELS } from '@scanorder/contracts';
 import { api } from '../api';
+import { useCustomerSession } from '../CustomerSession';
 import { FoodImage, formatTime, Header, LoadingError, Notice } from '../components';
 import { useResource } from '../useResource';
 
 export function OrderList() {
   const resource = useResource(api.orders);
+  const session = useCustomerSession();
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState('');
+  async function logout() {
+    setLoggingOut(true);
+    setLogoutError('');
+    try {
+      await session.logout();
+    } catch (failure) {
+      setLogoutError(failure instanceof Error ? failure.message : '退出失败，请重试');
+      setLoggingOut(false);
+    }
+  }
   return (
     <main className="page-shell">
       <Header title="订单列表" />
       <div className="page-scroll">
+        <div className="mx-4 mt-3 flex items-center justify-between rounded-lg bg-white px-4 py-3 text-sm">
+          <span>
+            当前顾客 <strong>{session.displayName}</strong>
+          </span>
+          <button
+            className="text-orange-600 disabled:text-gray-400"
+            onClick={logout}
+            disabled={loggingOut}
+          >
+            {loggingOut ? '正在退出…' : '退出'}
+          </button>
+        </div>
+        {logoutError && <Notice error>{logoutError}</Notice>}
         <LoadingError {...resource} />
         {resource.data?.length === 0 && <Notice>暂无订单，快去选几道喜欢的菜吧</Notice>}
         {resource.data?.map((order) => (
@@ -23,7 +50,7 @@ export function OrderList() {
             <div className="flex justify-between gap-3 text-sm">
               <h2 className="font-medium">{order.location}</h2>
               <span className="shrink-0 text-xs text-orange-600">
-                {order.finished ? '订单已完成' : '订单未完成'}
+                {ORDER_STATUS_LABELS[order.status]}
               </span>
             </div>
             <div className="mt-6 flex justify-between text-sm">
@@ -48,7 +75,7 @@ function Detail({ id }: { id: string }) {
       {order && (
         <>
           <section className="order-status">
-            <h2 className="text-xl font-medium">{order.finished ? '订单已完成' : '订单未完成'}</h2>
+            <h2 className="text-xl font-medium">{ORDER_STATUS_LABELS[order.status]}</h2>
             <p className="mt-2 text-xs">感谢光临，祝您用餐愉快</p>
           </section>
           <section className="white-card">

@@ -9,14 +9,46 @@ export const SHOP = {
 export const MAX_PRICE_CENTS = 10_000_000;
 export const MAX_QUANTITY = 999;
 
+export type FoodStatus = 'active' | 'inactive' | 'archived';
+export type OrderStatus = 'pending' | 'accepted' | 'completed' | 'cancelled';
+
+export const FOOD_STATUS_LABELS: Record<FoodStatus, string> = {
+  active: '已上架',
+  inactive: '已下架',
+  archived: '已归档',
+};
+
+export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  pending: '待接单',
+  accepted: '已接单',
+  completed: '已完成',
+  cancelled: '已取消',
+};
+
+export interface Category {
+  id: string;
+  name: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface AdminCategory extends Category {
+  foodCount: number;
+}
+
 export interface Food {
   id: string;
-  category: string;
+  categoryId: string;
+  categoryName: string;
+  categorySortOrder: number;
   name: string;
   priceCents: number;
   description: string;
   imageUrl: string;
   recommended: boolean;
+  status: FoodStatus;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CartItem {
@@ -25,11 +57,22 @@ export interface CartItem {
 }
 
 export interface CreateFoodInput {
-  category: string;
+  categoryId: string;
   name: string;
   priceCents: number;
   description: string;
   recommended: boolean;
+}
+
+export type UpdateFoodInput = CreateFoodInput;
+
+export interface CreateCategoryInput {
+  name: string;
+}
+
+export interface UpdateCategoryInput {
+  name?: string;
+  sortOrder?: number;
 }
 
 export interface CreateOrderInput {
@@ -51,6 +94,7 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
+  customerId: string | null;
   location: string;
   tableNumber: string;
   guestCount: number;
@@ -58,9 +102,27 @@ export interface Order {
   items: OrderItem[];
   totalAmountCents: number;
   totalQuantity: number;
-  finished: boolean;
+  status: OrderStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Page<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface AuthStatus {
+  enabled: boolean;
+  authenticated: boolean;
+  displayName: string | null;
+}
+
+export interface UpdateOrderStatusInput {
+  status: Exclude<OrderStatus, 'pending'>;
 }
 
 export function formatMoney(cents: number): string {

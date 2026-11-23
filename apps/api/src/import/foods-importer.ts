@@ -8,10 +8,12 @@ import { yuanToCents } from '@scanorder/contracts';
 import type { CreateFoodInput } from '@scanorder/contracts';
 import { FoodEntity } from '../foods/entities/food.entity.js';
 import { CreateFoodDto } from '../foods/dto/create-food.dto.js';
+import { CategoryEntity } from '../categories/entities/category.entity.js';
 import { ImageStorageService } from '../storage/image-storage.service.js';
 import { createImageFilename, inspectImage, MAX_IMAGE_SIZE } from '../storage/image.js';
 
-export interface PreparedFood extends CreateFoodInput {
+export interface PreparedFood extends Omit<CreateFoodInput, 'categoryId'> {
+  category: string;
   legacyId: string;
   image: Buffer;
   filename: string;
@@ -125,18 +127,30 @@ export async function importPreparedFoods(
       for (const food of foods) {
         const stored = await storage.saveImported(food.image, food.filename);
         if (stored.created) createdFiles.push(stored.filename);
+        const categories = manager.getRepository(CategoryEntity);
+        let category = await categories.findOneBy({ name: food.category });
+        if (!category) {
+          const max = await categories.maximum('sortOrder');
+          category = await categories.save({
+            id: randomUUID(),
+            name: food.category,
+            sortOrder: (max ?? -1) + 1,
+          });
+        }
         const repository = manager.getRepository(FoodEntity);
         const existing = await repository.findOneBy({ legacyId: food.legacyId });
         await repository.save(
           repository.create({
             id: existing?.id ?? randomUUID(),
             legacyId: food.legacyId,
-            category: food.category,
+            categoryId: existing?.categoryId ?? category.id,
             name: food.name,
             description: food.description,
             priceCents: food.priceCents,
             recommended: food.recommended,
             imageUrl: stored.imageUrl,
+            status: existing?.status ?? 'active',
+            updatedAt: new Date(),
           }),
         );
       }

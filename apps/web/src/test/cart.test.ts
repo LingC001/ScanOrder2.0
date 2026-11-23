@@ -4,12 +4,17 @@ import { cartReducer, cartTotals, initialCart } from '../cart';
 
 const food: Food = {
   id: 'a',
-  category: '小食',
+  categoryId: 'category-a',
+  categoryName: '小食',
+  categorySortOrder: 1,
   name: '同名菜',
   priceCents: 29,
   description: '测试',
   imageUrl: '/images/a.png',
   recommended: false,
+  status: 'active',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
 };
 
 describe('购物车', () => {

@@ -26,17 +26,29 @@ export function planViews(directory = root) {
 
 export function productViews(directory = root) {
   const result = {};
-  for (const name of ['menu', 'ordering', 'food-media']) {
+  const views = [];
+  for (const { name, label } of [
+    { name: 'account-sessions', label: '身份与会话' },
+    { name: 'merchant-admin', label: '商家后台' },
+    { name: 'menu', label: '菜单与购物车' },
+    { name: 'ordering', label: '订单' },
+    { name: 'food-media', label: '图片与菜品导入' },
+  ]) {
     let source = `openspec/specs/${name}/spec.md`;
     if (!existsSync(resolve(directory, source))) {
       source = `openspec/changes/align-full-harness/specs/${name}/spec.md`;
     }
-    if (!existsSync(resolve(directory, source))) throw new Error(`缺少产品规范：${name}`);
+    if (!existsSync(resolve(directory, source))) {
+      if (['menu', 'ordering', 'food-media'].includes(name))
+        throw new Error(`缺少产品规范：${name}`);
+      continue;
+    }
     result[`docs/product-specs/${name}.md`] =
       `# ${name} 产品行为\n\n生成阅读视图，修改应回到 [OpenSpec 来源](../../${source})。\n\n${readFileSync(resolve(directory, source), 'utf8')}`;
+    views.push(`- [${label}](${name}.md)`);
   }
   result['docs/product-specs/index.md'] =
-    '# 产品行为索引\n\n以下规范视图由 OpenSpec 生成，当前代码行为是建立首次基线的依据。活动变更未归档时，来源链接明确指向其增量文件。\n\n- [首次点餐流程](new-user-onboarding.md)\n- [菜单与购物车](menu.md)\n- [订单](ordering.md)\n- [图片与菜品导入](food-media.md)\n';
+    `# 产品行为索引\n\n以下阅读视图优先使用 OpenSpec 正式规范。首次建立基线且尚无正式规范时，使用对应的增量规范。可从 [活动计划](../exec-plans/active/index.md) 查阅进行中的方案和增量规范。\n\n- [首次点餐流程](new-user-onboarding.md)\n${views.join('\n')}\n`;
   return result;
 }
 

@@ -1,9 +1,8 @@
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsInt, IsString, Length, Max, Min } from 'class-validator';
 import { MAX_PRICE_CENTS } from '@scanorder/contracts';
-import type { CreateFoodInput } from '@scanorder/contracts';
 
-export class CreateFoodDto implements CreateFoodInput {
+export class CreateFoodDto {
   @IsString({ message: '分类必须是文字' })
   @Length(1, 50, { message: '分类长度须为1至50字' })
   @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))

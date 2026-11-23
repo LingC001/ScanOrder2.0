@@ -16,7 +16,7 @@ export function Choose() {
   const [cartOpen, setCartOpen] = useState(false);
   const [preview, setPreview] = useState<Food | null>(null);
   const foods = resource.data ?? [];
-  const categories = [...new Set(foods.map((food) => food.category))];
+  const categories = [...new Set(foods.map((food) => food.categoryName))];
   const selected = category && categories.includes(category) ? category : categories[0];
   const recommended = foods.filter((food) => food.recommended);
   const add = (food: Food) => dispatch({ type: 'add', food });
@@ -101,7 +101,7 @@ export function Choose() {
           <div className="min-w-0 flex-1 overflow-y-auto px-3">
             <h2 className="sticky top-0 bg-white pt-3 pb-2 text-sm font-medium">{selected}</h2>
             {foods
-              .filter((food) => food.category === selected)
+              .filter((food) => food.categoryName === selected)
               .map((food) => (
                 <article key={food.id} className="menu-item">
                   <button

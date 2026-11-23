@@ -6,10 +6,11 @@
 
 - 人数选择、商家信息、推荐菜品、分类选菜、图片预览。
 - 购物车数量调整、清空、订单备注、模拟下单。
-- 订单列表、订单详情、菜品图片上传及新增。
+- 固定顾客账号登录、本人订单列表及详情。
+- 商家后台商品、分类和订单管理，支持商品上下架、归档恢复及订单接单、完成和取消。
 - MongoDB 菜品 JSON 与图片导入 PostgreSQL；不迁移历史订单。
 
-沿用原移动端橙色风格，宽屏居中展示。仅重构原有功能，未实现原占位接口对应的菜品编辑/删除、登录、商家后台或真实支付。订单列表和上传接口延续原项目无登录的行为。
+沿用原移动端橙色风格，宽屏居中展示。商家后台位于 `/admin`，移动端点餐保留独立宽度。顾客登录入口默认与本机联调共用，生产环境必须替换商家凭据，并按部署场景决定是否开启固定顾客账号。当前订单仍不包含真实支付。
 
 ## 环境
 
@@ -21,38 +22,67 @@
 
 ## 本地运行
 
-以下命令均在项目根目录执行：
+在项目根目录安装依赖，首次运行时创建 `.env`。
 
 ```powershell
 pnpm install --frozen-lockfile
-Copy-Item .env.example .env
+if (-not (Test-Path -LiteralPath .env)) { Copy-Item .env.example .env }
+```
+
+### 选择一种数据库启动方式
+
+**项目自带 PostgreSQL**。确认 `.env` 的 `DATABASE_URL` 使用 `127.0.0.1:5432`。另开终端运行以下命令，看到 PostgreSQL 启动后保持终端打开。数据保存在项目的 `.local/postgres18`。
+
+```powershell
+pnpm db:local
+```
+
+**Docker Compose**。启动 Docker 后，先把 `.env` 的 `DATABASE_URL` 端口改为 `5433`，再运行以下命令，等待数据库就绪。
+
+```powershell
 pnpm db:up
+```
+
+### 执行迁移并启动应用
+
+在运行迁移的终端确认数据库端口与所选方式一致。若终端已设置 `DATABASE_URL` 环境变量，它会优先于 `.env`。
+
+```powershell
 pnpm --filter @scanorder/contracts build
 pnpm db:migrate
 ```
 
-没有启动 Docker 时，在独立终端执行 `pnpm db:local`，保持该终端运行，即可替代 `pnpm db:up`。该命令在本机启动真实 PostgreSQL 18.4，监听 `127.0.0.1:5432`，数据保留在项目 `.local/postgres18`；不安装系统服务。Docker 版本为 PostgreSQL 18.6。
-
-当前 Compose 将数据库映射到本机 `5433` 端口。使用 `pnpm db:up` 时，应将 `.env` 中数据库连接的端口设为 `5433`；使用 `pnpm db:local` 时继续使用 `5432`。
-
-数据库建好后，可选导入**演示菜品**（原素材配合演示名称、描述和价格，不代表实际菜单）：
+迁移完成后，可选导入**演示菜品**（使用原素材和演示名称、描述、价格）。
 
 ```powershell
 pnpm data:import --file examples/foods.json --images-dir examples/images --dry-run
 pnpm data:import --file examples/foods.json --images-dir examples/images
+```
+
+启动前端和后端。
+
+```powershell
 pnpm dev
 ```
 
-前端打开 [http://localhost:5173](http://localhost:5173)，后端默认监听 `127.0.0.1:3000`。菜品上传页面为 [http://localhost:5173/upload](http://localhost:5173/upload)。
+前端打开 [http://localhost:5173](http://localhost:5173)，后端默认监听 `127.0.0.1:3000`。顾客首次进入时登录默认顾客账号；商家后台为 [http://localhost:5173/admin](http://localhost:5173/admin)。
+
+`.env.example` 的开发商家账号为 `admin`，示例口令为 `scanorder-admin`，仅用于本机。生产环境必须生成并配置自己的 `ADMIN_PASSWORD_HASH`。
 
 根目录 `.env` 配置：
 
-| 变量           | 默认示例                                                    | 说明                                       |
-| -------------- | ----------------------------------------------------------- | ------------------------------------------ |
-| `DATABASE_URL` | `postgresql://scanorder:scanorder@127.0.0.1:5432/scanorder` | PostgreSQL 连接                            |
-| `PORT`         | `3000`                                                      | 后端端口                                   |
-| `HOST`         | `127.0.0.1`                                                 | 后端监听地址                               |
-| `UPLOAD_DIR`   | `./uploads`                                                 | 相对项目根目录的图片目录，也可使用绝对路径 |
+| 变量                     | 默认示例                                                    | 说明                                       |
+| ------------------------ | ----------------------------------------------------------- | ------------------------------------------ |
+| `DATABASE_URL`           | `postgresql://scanorder:scanorder@127.0.0.1:5432/scanorder` | PostgreSQL 连接                            |
+| `PORT`                   | `3000`                                                      | 后端端口                                   |
+| `HOST`                   | `127.0.0.1`                                                 | 后端监听地址                               |
+| `UPLOAD_DIR`             | `./uploads`                                                 | 相对项目根目录的图片目录，也可使用绝对路径 |
+| `ADMIN_USERNAME`         | `admin`                                                     | 商家后台账号                               |
+| `ADMIN_PASSWORD_HASH`    | `scrypt$盐$哈希`                                            | 商家口令哈希，生产环境必填                 |
+| `CUSTOMER_LOGIN_ENABLED` | `true`                                                      | 是否开放固定顾客一键登录                   |
+| `CUSTOMER_ACCOUNT_ID`    | `default-customer`                                          | 顾客会话及订单归属标识                     |
+| `CUSTOMER_ACCOUNT_NAME`  | `顾客`                                                      | 顾客端展示名称                             |
+| `COOKIE_SECURE`          | 生产环境默认为 `true`                                       | 会话 Cookie 是否只通过 HTTPS 发送          |
 
 Vite 将 `/api` 和 `/images` 代理至后端。修改后端端口时，同时通过运行环境变量 `API_PROXY_TARGET` 指定代理目标。手机在同一局域网访问电脑 IP 的 `5173` 端口即可，前端开发服务监听 `0.0.0.0`。
 
@@ -68,11 +98,11 @@ examples              演示菜单和原项目图片素材
 docs                  工程知识、产品规范及质量验收资料
 ```
 
-`apps/api/src` 按职责划分为 `config`、`database`、`foods`、`orders`、`storage` 和
-`import`。根模块只负责组合；菜品和订单分别拥有自己的模块、实体、DTO、映射及
-Repository，图片格式校验和本地文件读写统一由存储模块提供。
+`apps/api/src` 按职责划分为 `auth`、`categories`、`config`、`database`、`foods`、`orders`、`storage` 和 `import`。根模块只负责组合；商家与顾客会话分别校验，分类、商品和订单拥有各自模块、实体、DTO、映射及 Repository。图片格式校验和本地文件读写统一由存储模块提供。
 
 商家名称、公告、地址和默认桌号集中在共享包 `SHOP` 常量中。购物车以菜品 UUID 区分同名商品，只在当前 H5 会话的内存中保留。刷新页面会重置购物车和人数，数据库中的订单不受影响。
+
+商品新增与恢复后默认下架，商家上架后才进入顾客菜单。分类按后台维护顺序展示，仍有关联商品的分类不能删除。归档商品和下线前生成的历史订单快照保留在数据库中。
 
 ## 检查与测试
 

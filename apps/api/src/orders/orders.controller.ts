@@ -1,17 +1,16 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { CustomerAuthGuard } from '../auth/auth.guard.js';
+import type { AuthenticatedRequest } from '../auth/auth.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { OrdersService } from './orders.service.js';
 
 @Controller('orders')
+@UseGuards(CustomerAuthGuard)
 export class OrdersController {
   constructor(private readonly orders: OrdersService) {}
-  @Post() create(@Body() dto: CreateOrderDto) {
-    return this.orders.create(dto);
-  }
-  @Get() list() {
-    return this.orders.list();
-  }
-  @Get(':id') detail(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.orders.detail(id);
+
+  @Post()
+  create(@Body() dto: CreateOrderDto, @Req() request: AuthenticatedRequest) {
+    return this.orders.create(dto, request.auth!.id);
   }
 }

@@ -7,11 +7,13 @@ import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import type { Repository } from 'typeorm';
 import { workspaceRoot } from '../src/config/index.js';
+import { CategoryEntity } from '../src/categories/entities/category.entity.js';
 import { CreateFoodDto } from '../src/foods/dto/create-food.dto.js';
 import { FoodEntity } from '../src/foods/entities/food.entity.js';
 import { FoodsService } from '../src/foods/foods.service.js';
 import { parseExport, prepareFoods } from '../src/import/foods-importer.js';
 import { CreateOrderDto } from '../src/orders/dto/create-order.dto.js';
+import { isPasswordHash, verifyPassword } from '../src/auth/password.js';
 import { ImageStorageService } from '../src/storage/image-storage.service.js';
 import { createImageFilename, inspectImage } from '../src/storage/image.js';
 
@@ -118,12 +120,19 @@ test('图片写入后数据库保存失败，会清理本次上传文件', async
         throw new Error('模拟数据库故障');
       },
     } as unknown as Repository<FoodEntity>;
-    const service = new FoodsService(repository, new ImageStorageService(directory));
+    const categoryRepository = {
+      existsBy: async () => true,
+    } as unknown as Repository<CategoryEntity>;
+    const service = new FoodsService(
+      repository,
+      categoryRepository,
+      new ImageStorageService(directory),
+    );
     const image = await readFile(resolve(workspaceRoot, 'examples/images/纸巾.png'));
     await assert.rejects(
       service.create(
         {
-          category: '纸巾',
+          categoryId: 'a151b3fc-9597-4cc6-ad25-9ba712978c78',
           name: '纸巾',
           description: '一包',
           priceCents: 100,
@@ -137,6 +146,15 @@ test('图片写入后数据库保存失败，会清理本次上传文件', async
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+test('商家密码哈希只接受 scrypt 格式并正确校验口令', () => {
+  const hash =
+    'scrypt$74c7eb69e108ad818bd53b5685608161$9311a396f129c49770063757023ea2cf9cf7a6c864656866e5589068531dbc9364c4fe4413e31ba1af4ed36ced6325ed5e050472b943fbe9142419b33e1730cb';
+  assert.equal(isPasswordHash(hash), true);
+  assert.equal(verifyPassword('scanorder-admin', hash), true);
+  assert.equal(verifyPassword('错误口令', hash), false);
+  assert.equal(isPasswordHash('plain-text'), false);
 });
 
 test('导入图片按内容复用，并拒绝同名不同内容', async () => {
