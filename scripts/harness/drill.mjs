@@ -32,6 +32,7 @@ try {
     await context.tracing.start({ snapshots: true, screenshots: true });
     const page = await context.newPage();
     await page.goto(runtime.webUrl);
+    await page.getByRole('button', { name: '登录并开始点餐' }).click();
     await page.getByRole('button', { name: '开始点餐' }).click();
     await page.getByRole('button', { name: '选购香辣花甲' }).first().click();
     await page.getByRole('button', { name: '查看购物车' }).click();

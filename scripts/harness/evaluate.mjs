@@ -1,4 +1,5 @@
 import { mkdirSync, readFileSync, existsSync, copyFileSync, readdirSync } from 'node:fs';
+import { rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { chromium, devices } from '@playwright/test';
@@ -19,13 +20,29 @@ const check = (name, ok) => {
   result.checks.push({ name, passed: Boolean(ok) });
   if (!ok) throw new Error(`验收失败：${name}`);
 };
+async function login(apiUrl, path, body) {
+  const response = await fetch(`${apiUrl}/api/auth/${path}`, {
+    method: 'POST',
+    ...(body
+      ? { headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }
+      : {}),
+  });
+  const cookie = response.headers.get('set-cookie')?.split(';')[0];
+  if (response.status !== 201 || !cookie) throw new Error(`登录失败：${path}`);
+  return cookie;
+}
 try {
   for (const suffix of ['a', 'b']) {
     const workspace = await createWorkspace(root, `${id}-${suffix}`);
     workspaces.push(workspace);
     const cli = process.env.npm_execpath;
-    if (cli)
+    if (cli && /pnpm[^/\\]*\.(?:c?js|mjs)$/.test(cli) && existsSync(cli))
       await command(process.execPath, [cli, 'install', '--frozen-lockfile'], {
+        cwd: workspace.worktree,
+        timeout: 180000,
+      });
+    else if (cli && /\.exe$/i.test(cli) && existsSync(cli))
+      await command(cli, ['install', '--frozen-lockfile'], {
         cwd: workspace.worktree,
         timeout: 180000,
       });
@@ -46,12 +63,20 @@ try {
     '端口和观测后端独立',
     a.apiPort !== b.apiPort && a.webPort !== b.webPort && a.containerId !== b.containerId,
   );
-  const foods = await (await fetch(`${a.apiUrl}/api/foods`)).json();
+  const customerA = await login(a.apiUrl, 'customer/login');
+  const customerB = await login(b.apiUrl, 'customer/login');
+  const adminA = await login(a.apiUrl, 'merchant/login', {
+    username: 'admin',
+    password: 'scanorder-admin',
+  });
+  const foods = await (
+    await fetch(`${a.apiUrl}/api/foods`, { headers: { cookie: customerA } })
+  ).json();
   check('非空真实菜单', foods.length === 3);
   const secret = '诊断脱敏验收备注';
   const response = await fetch(`${a.apiUrl}/api/orders`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', cookie: customerA },
     body: JSON.stringify({
       tableNumber: '3111',
       guestCount: 2,
@@ -64,10 +89,20 @@ try {
     '订单金额由服务端计算',
     response.status === 201 && order.totalAmountCents === foods[0].priceCents * 2,
   );
-  check('订单数据库互不串用', (await (await fetch(`${b.apiUrl}/api/orders`)).json()).length === 0);
+  check(
+    '订单数据库互不串用',
+    (
+      await (
+        await fetch(`${b.apiUrl}/api/customer/orders`, { headers: { cookie: customerB } })
+      ).json()
+    ).length === 0,
+  );
+  const categories = await (
+    await fetch(`${a.apiUrl}/api/admin/categories`, { headers: { cookie: adminA } })
+  ).json();
   const form = new FormData();
   for (const [k, v] of Object.entries({
-    category: '验收分类',
+    categoryId: categories[0].id,
     name: '隔离上传',
     description: '验证实例文件隔离',
     priceCents: '100',
@@ -76,10 +111,14 @@ try {
     form.set(k, v);
   form.set(
     'image',
-    new Blob([readFileSync(resolve(root, 'examples/images/纸巾.png'))]),
+    new Blob([new Uint8Array(readFileSync(resolve(root, 'examples/images/纸巾.png')))]),
     '图片.png',
   );
-  const uploaded = await fetch(`${a.apiUrl}/api/foods`, { method: 'POST', body: form });
+  const uploaded = await fetch(`${a.apiUrl}/api/admin/foods`, {
+    method: 'POST',
+    headers: { cookie: adminA },
+    body: form,
+  });
   const food = await uploaded.json();
   check('图片上传成功', uploaded.status === 201);
   check('上传文件互不串用', (await fetch(`${b.apiUrl}${food.imageUrl}`)).status === 404);
@@ -115,6 +154,7 @@ try {
     await context.tracing.start({ screenshots: true, snapshots: true });
     const page = await context.newPage();
     await page.goto(a.webUrl);
+    await page.getByRole('button', { name: '登录并开始点餐' }).click();
     await page.getByRole('button', { name: '开始点餐' }).click();
     await page.getByRole('button', { name: '选购香辣花甲' }).first().click();
     for (const width of [375, 390, 430]) {
@@ -165,7 +205,24 @@ try {
             );
         }
       assertOwned(root, workspace.worktree);
-      await command('git', ['worktree', 'remove', '--force', workspace.worktree]);
+      try {
+        await command('git', [
+          '-c',
+          'core.longpaths=true',
+          'worktree',
+          'remove',
+          '--force',
+          workspace.worktree,
+        ]);
+      } catch {
+        await rm(assertOwned(root, workspace.worktree), {
+          recursive: true,
+          force: true,
+          maxRetries: 3,
+          retryDelay: 200,
+        });
+        await command('git', ['worktree', 'prune']);
+      }
     } catch (error) {
       result.status = 'failed';
       result.cleanupError = error.message;
