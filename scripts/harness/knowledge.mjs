@@ -37,8 +37,7 @@ export function checkKnowledge(directory = root) {
     'design-docs/index.md',
     'design-docs/core-beliefs.md',
     'design-docs/runtime-observability.md',
-    'exec-plans/tech-debt-tracker.md',
-    'product-specs/new-user-onboarding.md',
+    'tech-debt-tracker.md',
     'references/stack-reference-llms.txt',
     'references/design-system-reference-llms.txt',
   ];

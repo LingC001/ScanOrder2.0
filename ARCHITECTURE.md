@@ -41,7 +41,7 @@ PostgreSQL 18；本地图片存储
 - 购物车以菜品 UUID 为标识，保存在当前页面会话内存中。
 - 数据库使用显式迁移，关闭自动同步；测试使用独立临时实例和上传目录，不复用开发数据。
 
-迁移注册见 [数据源](apps/api/src/database/data-source.ts)，现行表结构见 [数据库结构](docs/generated/db-schema.md)。顾客操作与业务边界见 [首次点餐流程](docs/product-specs/new-user-onboarding.md)。
+迁移注册见 [数据源](apps/api/src/database/data-source.ts)，现行表结构见 [数据库结构](docs/generated/db-schema.md)。顾客操作与业务边界见 [首次点餐流程](docs/product/new-user-onboarding.md)。
 
 ## 工程反馈
 

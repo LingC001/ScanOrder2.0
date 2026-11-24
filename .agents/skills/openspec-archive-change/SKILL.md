@@ -17,4 +17,4 @@ metadata:
 4. 读取 `pnpm exec openspec instructions archive --change 变更名称 --json` 的项目上下文与可选 guidance；此附加输入不替代完成状态。说明本地与远端验证的实际范围。
 5. 使用项目同步规范技能完成语义合并及正式规范校验；同步失败时不移动变更。
 6. 在同步成功且已有归档授权时执行 `pnpm exec openspec archive 变更名称 --skip-specs --yes`，此处跳过的是重复同步，不跳过验证。
-7. 归档后执行 `pnpm docs:generate` 更新唯一来源的阅读投影，再执行 `pnpm check:generated`、`pnpm check:knowledge`、`pnpm check:spec` 和 `pnpm check:docs`。来源变化需实际核实文档后再确认指纹。报告归档路径、正式规范及实际验收结果。保留用户未要求修改的全局 CLI 和提示词。
+7. 归档后执行 `pnpm check:knowledge`、`pnpm check:spec` 和 `pnpm check:docs`。涉及数据库结构时，运行 `pnpm docs:generate` 更新结构文档，再执行 `pnpm check:generated`。工程知识来源变化需实际核实文档后再确认指纹。报告归档路径、正式规范及实际验收结果。保留用户未要求修改的全局 CLI 和提示词。

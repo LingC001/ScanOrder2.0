@@ -33,6 +33,21 @@ test('新增知识文件必须能从索引到达', (t) => {
   assert.ok(checkDocs(directory).some((issue) => issue.includes('docs/无入口.md [知识索引]')));
 });
 
+test('手写业务原稿沿用目录级导航并保留仓库内链接检查', (t) => {
+  const { directory, write } = docsFixture(t);
+  const draft = 'docs/product/商家/新需求.md';
+  write(draft, '# 新需求\n');
+  assert.ok(checkDocs(directory).some((issue) => issue.includes(`${draft} [知识索引]`)));
+
+  const indexPath = 'docs/README.md';
+  const index = readFileSync(resolve(directory, indexPath), 'utf8');
+  write(indexPath, `${index}\n- [手写原稿](product/)\n`);
+  assert.deepEqual(checkDocs(directory), []);
+
+  write(draft, '# 新需求\n\n[失效链接](不存在.md)\n');
+  assert.match(checkDocs(directory).join('\n'), /新需求\.md \[文档链接\] 目标不存在/);
+});
+
 test('必要文档和技能元数据校验明确失败', (t) => {
   const { directory, write } = docsFixture(t);
   write('.agents/skills/openspec-propose/SKILL.md', '---\nname: wrong\ndescription: ""\n---\n');

@@ -8,7 +8,6 @@ import {
   checkKnowledge,
   acknowledgeKnowledge,
 } from '../../scripts/harness/knowledge.mjs';
-import { planViews, productViews } from '../../scripts/harness/generate-docs.mjs';
 import { assertMetric } from '../../scripts/harness/observe.mjs';
 
 test('知识来源变化会失败而不是自动确认', (t) => {
@@ -29,16 +28,6 @@ test('知识来源变化会失败而不是自动确认', (t) => {
   f.write('src/a.ts', 'export const x=2;');
   assert.ok(checkKnowledge(f.directory).some((x) => x.includes('来源已变化')));
 });
-test('计划投影只链接到唯一来源且能反映活动与归档状态', (t) => {
-  const f = fixture(t, {
-    'openspec/changes/sample/tasks.md': '- [ ] 工作',
-    'openspec/changes/archive/old/tasks.md': '- [x] 完成',
-  });
-  const view = planViews(f.directory);
-  assert.match(view['docs/exec-plans/active/index.md'], /changes\/sample\/tasks.md/);
-  assert.match(view['docs/exec-plans/completed/index.md'], /archive\/old\/tasks.md/);
-});
-
 test('只确认已核实文档，其他来源漂移仍会失败', async (t) => {
   const f = fixture(t, {
     'src/a.ts': 'a',
@@ -61,19 +50,14 @@ test('只确认已核实文档，其他来源漂移仍会失败', async (t) => {
   assert.equal(issues.length, 1);
   assert.match(issues[0], /FRONTEND/);
 });
-test('产品阅读视图使用正式规范的最新内容', (t) => {
-  const f = fixture(
-    t,
-    Object.fromEntries(
-      ['menu', 'ordering', 'food-media'].map((n) => [
-        `openspec/specs/${n}/spec.md`,
-        '# 已确认行为',
-      ]),
-    ),
-  );
-  assert.match(productViews(f.directory)['docs/product-specs/menu.md'], /已确认行为/);
-  f.write('openspec/specs/menu/spec.md', '# 新行为');
-  assert.match(productViews(f.directory)['docs/product-specs/menu.md'], /新行为/);
+test('手写业务原稿无需源码指纹，技术债台账仍需登记', (t) => {
+  const { directory, write } = fixture(t, {
+    'docs/manifest.json': JSON.stringify({ documents: {} }),
+    'docs/product/new-user-onboarding.md': '# 手写业务原稿\n',
+  });
+  assert.deepEqual(checkKnowledge(directory), []);
+  write('docs/tech-debt-tracker.md', '# 技术债跟踪\n');
+  assert.deepEqual(checkKnowledge(directory), ['docs/tech-debt-tracker.md：知识来源未登记']);
 });
 test('指标断言拒绝缺失、非数值与越界样本', () => {
   assert.throws(

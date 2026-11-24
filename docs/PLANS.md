@@ -1,8 +1,8 @@
 # 计划与变更流程
 
-按 [OpenSpec 新建条件](../AGENTS.md#openspec-新建条件) 自行判断是直接处理、沿用已有变更还是新建。OpenSpec 是行为规范和执行计划的唯一来源，制品包括 proposal、specs、design 和 tasks。本目录的活动和完成计划导航根据 OpenSpec 变更生成。
+按 [OpenSpec 新建条件](../AGENTS.md#openspec-新建条件) 自行判断是直接处理、沿用已有变更还是新建。OpenSpec 是正式行为规范和执行计划的唯一来源，制品包括 proposal、specs、design 和 tasks。有对应的[手写业务原稿](product/)时，AI 在提案中链接原稿并形成可验收的工程制品。
 
-任务按依赖推进，测试和文档随相应实现落地，实际完成并验证后才勾选。已有用户实施授权可直接承接。归档前核对跟踪任务、实际证据和未验证项；同步规范后重新生成阅读视图。
+任务按依赖推进，测试和文档随相应实现落地，实际完成并验证后才勾选。已有用户实施授权可直接承接。归档前核对跟踪任务、实际证据和未验证项，再按工作流同步规范。
 
 起草计划时写清目标、范围和受影响模块，列出可验证的验收条件。有部署或数据风险时补充回退办法。执行中在对应的 OpenSpec 变更里记录进度、决策和验证结果。
 
@@ -47,6 +47,8 @@ pnpm exec openspec validate --all --strict --no-interactive
 
 CI 每次 push、PR 或手动触发均执行完整自动检查。自动浏览器截图只证明自动化步骤执行，不替代人工对照设计稿。
 
+Windows CI 运行 `node scripts/harness/verify.mjs windows-ci`，覆盖类型、静态检查、构建、单元测试和工程门禁。Ubuntu CI 运行 `pnpm verify`，额外使用临时 PostgreSQL 检查迁移生成的数据库文档。本地 `pnpm verify` 与 `pnpm verify:full` 均包含该检查。
+
 `pnpm check:spec` 执行严格校验，并将与当前正式规范冲突的归档提示视为失败。修改已有要求时，从正式规范复制完整要求及场景后编写增量。归档仍需核对任务、实测证据和合并后的正式规范。
 
 ### 主分支合入
@@ -66,7 +68,9 @@ CI 每次 push、PR 或手动触发均执行完整自动检查。自动浏览器
 
 ## 知识更新
 
-各专题的入口见 [知识索引](README.md)。生成资料和来源检查分别使用 `pnpm check:generated`、`pnpm check:knowledge`；确认来源变化对单篇文档的影响后执行如 `pnpm docs:ack docs/FRONTEND.md`。只有首次建立并核实全部基线时使用 `--all`，不得用它掩盖未阅读的来源变化。
+各专题的入口见 [知识索引](README.md)。`pnpm docs:generate` 生成数据库结构文档，`pnpm check:generated` 校验生成结果。`pnpm check:knowledge` 检查与实现关联的工程文档来源。确认来源变化对单篇文档的影响后，执行如 `pnpm docs:ack docs/FRONTEND.md`。只有首次建立并核实全部基线时使用 `--all`，不得用它掩盖未核实的来源变化。
+
+知识索引登记手写业务原稿目录。新增原稿可以直接放入目录，文档检查会核对其中的仓库内链接。
 
 ## 隔离维护与演练
 

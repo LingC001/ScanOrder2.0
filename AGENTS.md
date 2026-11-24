@@ -18,7 +18,8 @@
 - 安装与启动：[README](README.md)。
 - 包边界与数据流：[架构地图](ARCHITECTURE.md)。
 - 工程知识与实现入口：[知识索引](docs/README.md)。
-- 产品、设计、质量、可靠性与安全分别由知识索引中的专题维护，OpenSpec 是规范与计划的唯一来源。
+- 用户在 [业务原稿目录](docs/product/) 手写需求、业务流程和规则。AI 默认读取和引用原稿，修改正文需用户明确指示。有对应原稿时，OpenSpec 提案链接原稿。
+- OpenSpec 制品由 AI 生成和维护，正式规范和执行计划统一存放在 OpenSpec。设计、质量、可靠性与安全等工程资料从知识索引进入。
 - 工程命令：[README](README.md)；验证分级与维护流程：[PLANS](docs/PLANS.md)；诊断与排障：[RELIABILITY](docs/RELIABILITY.md)。
 - OpenSpec 任务先读取 `openspec/config.yaml`，按下方判断规则选用项目级技能。
 - 局部约定：[前端](apps/web/AGENTS.md)、[后端](apps/api/AGENTS.md)、[共享包](packages/contracts/AGENTS.md)。

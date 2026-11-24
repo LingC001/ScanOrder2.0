@@ -74,8 +74,10 @@ export function checkDocs(directory = root) {
     for (const target of graph.get(path) ?? []) visit(target);
   };
   visit(resolve(directory, 'docs/README.md'));
+  const productDirectory = resolve(directory, 'docs/product');
+  const productReachable = reachable.has(productDirectory);
   for (const path of files(resolve(directory, 'docs')).filter((file) => file.endsWith('.md'))) {
-    if (!reachable.has(path))
+    if (!reachable.has(path) && !(productReachable && inside(productDirectory, path)))
       issues.push(
         `${displayPath(path, directory)} [知识索引] 无法从 docs/README.md 的链接到达，请添加导航。`,
       );

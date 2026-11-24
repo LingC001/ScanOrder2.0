@@ -6,6 +6,6 @@
 
 固定顾客账号用于已确认的单人场景，同一账号跨设备查看上线后创建的订单。功能上线前无归属订单只在商家后台可见。当前订单仍为模拟流程，不包含真实支付、退款、顾客自助注册或员工账号。
 
-产品行为阅读视图见 [产品索引](product-specs/index.md)。
+业务流程和需求见 [手写原稿](product/)，生效的产品行为见 [OpenSpec 正式规范](../openspec/specs/)。
 
 依据：`packages/contracts/src/index.ts`、`apps/web/src/App.tsx`。

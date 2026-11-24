@@ -4,12 +4,15 @@ context: |
   当前项目为 ScanOrder 扫码点餐 H5，使用 pnpm monorepo、React、NestJS、TypeORM 和 PostgreSQL。
   apps/web 与 apps/api 通过 HTTP 通信，共享纯业务类型和金额工具位于 packages/contracts。
   当前代码与工程约定入口为 AGENTS.md、ARCHITECTURE.md 和 docs/README.md。
+  用户在 docs/product/ 维护手写需求、流程和业务规则。AI 默认读取并引用原稿，修改正文需用户明确指示。
+  OpenSpec 提案、设计、规范、实施任务及归档由 AI 生成与维护。已生效行为以正式规范为准。
   金额使用整数分，订单总价由服务端计算，订单明细保留快照；数据库使用显式迁移。
   本地浏览器访问 localhost；真实数据库测试使用独立临时实例。
   技能优先读取项目 .agents/skills；用户已明确授权的范围可直接承接。
 rules:
   proposal:
     - 说明问题、可观察结果、受影响能力及范围；先检查正式规范，避免重复能力。
+    - 有对应手写原稿时，在提案中以仓库内相对链接记录来源。
   specs:
     - 描述可观察行为与可验收场景，不把内部符号和实施步骤写成行为要求。
   design:

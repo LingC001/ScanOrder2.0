@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { format } from 'prettier';
@@ -12,51 +12,6 @@ import {
   startTemporaryDatabase,
 } from '../postgres.mjs';
 import { stopDatabase } from './runtime-cleanup.mjs';
-
-export function planViews(directory = root) {
-  const changes = resolve(directory, 'openspec/changes');
-  const names = (path) =>
-    existsSync(path)
-      ? readdirSync(path, { withFileTypes: true })
-          .filter((item) => item.isDirectory() && item.name !== 'archive')
-          .map((item) => item.name)
-          .sort()
-      : [];
-  const view = (items, source) =>
-    `# ${source === 'archive/' ? '已完成计划' : '活动计划'}\n\n由 OpenSpec 生成；计划内容仅在 OpenSpec 维护。\n\n${items.length ? items.map((name) => `- [${name}](../../../openspec/changes/${source}${name}/tasks.md)`).join('\n') : '当前没有对应变更。'}\n`;
-  return {
-    'docs/exec-plans/active/index.md': view(names(changes), ''),
-    'docs/exec-plans/completed/index.md': view(names(resolve(changes, 'archive')), 'archive/'),
-  };
-}
-
-export function productViews(directory = root) {
-  const result = {};
-  const views = [];
-  for (const { name, label } of [
-    { name: 'account-sessions', label: '身份与会话' },
-    { name: 'merchant-admin', label: '商家后台' },
-    { name: 'menu', label: '菜单与购物车' },
-    { name: 'ordering', label: '订单' },
-    { name: 'food-media', label: '图片与菜品导入' },
-  ]) {
-    let source = `openspec/specs/${name}/spec.md`;
-    if (!existsSync(resolve(directory, source))) {
-      source = `openspec/changes/align-full-harness/specs/${name}/spec.md`;
-    }
-    if (!existsSync(resolve(directory, source))) {
-      if (['menu', 'ordering', 'food-media'].includes(name))
-        throw new Error(`缺少产品规范：${name}`);
-      continue;
-    }
-    result[`docs/product-specs/${name}.md`] =
-      `# ${name} 产品行为\n\n生成阅读视图，修改应回到 [OpenSpec 来源](../../${source})。\n\n${readFileSync(resolve(directory, source), 'utf8')}`;
-    views.push(`- [${label}](${name}.md)`);
-  }
-  result['docs/product-specs/index.md'] =
-    `# 产品行为索引\n\n以下阅读视图优先使用 OpenSpec 正式规范。首次建立基线且尚无正式规范时，使用对应的增量规范。可从 [活动计划](../exec-plans/active/index.md) 查阅进行中的方案和增量规范。\n\n- [首次点餐流程](new-user-onboarding.md)\n${views.join('\n')}\n`;
-  return result;
-}
 
 export async function databaseView(directory = root) {
   const temporary = await testDirectory('schema-');
@@ -141,23 +96,19 @@ export async function databaseView(directory = root) {
 }
 
 export async function generate(mode, directory = root) {
-  const output = {
-    ...planViews(directory),
-    ...productViews(directory),
-    'docs/generated/db-schema.md': await databaseView(directory),
-  };
-  const stale = [];
-  for (const [name, body] of Object.entries(output)) {
-    const text = await format(body, { parser: 'markdown', proseWrap: 'preserve' });
-    const path = resolve(directory, name);
-    if (mode === 'write') {
-      mkdirSync(dirname(path), { recursive: true });
-      writeFileSync(path, text);
-    } else if (!existsSync(path) || readFileSync(path, 'utf8').replaceAll('\r\n', '\n') !== text)
-      stale.push(name);
+  const name = 'docs/generated/db-schema.md';
+  const path = resolve(directory, name);
+  const text = await format(await databaseView(directory), {
+    parser: 'markdown',
+    proseWrap: 'preserve',
+  });
+  if (mode === 'write') {
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, text);
+    return;
   }
-  if (stale.length)
-    throw new Error(`生成文档已过期：${stale.join('、')}；请执行 pnpm docs:generate`);
+  if (!existsSync(path) || readFileSync(path, 'utf8').replaceAll('\r\n', '\n') !== text)
+    throw new Error(`生成文档已过期：${name}；请执行 pnpm docs:generate`);
 }
 
 if (isMain(import.meta.url)) {

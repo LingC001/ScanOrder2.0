@@ -114,15 +114,15 @@ docs                  工程知识、产品规范及质量验收资料
 
 通过 `pnpm exec openspec --version` 核对项目 OpenSpec 版本。
 
-| 命令                      | 内容                                                 |
-| ------------------------- | ---------------------------------------------------- |
-| `pnpm check:docs`         | 必备文档、导航、本地链接和技能元数据                 |
-| `pnpm check:architecture` | 包边界、依赖方向和文件规模                           |
-| `pnpm check:spec`         | OpenSpec 正式规范与活动变更的严格校验                |
-| `pnpm check:knowledge`    | 人工维护文档的来源变化                               |
-| `pnpm check:generated`    | 规范、计划和数据库生成文档是否过期，需先完成必要构建 |
-| `pnpm test:harness`       | 工程检查器和运行工具的行为测试                       |
-| `pnpm docs:generate`      | 完成必要构建并生成知识阅读视图和数据库文档           |
+| 命令                      | 内容                                     |
+| ------------------------- | ---------------------------------------- |
+| `pnpm check:docs`         | 必备文档、导航、本地链接和技能元数据     |
+| `pnpm check:architecture` | 包边界、依赖方向和文件规模               |
+| `pnpm check:spec`         | OpenSpec 正式规范与活动变更的严格校验    |
+| `pnpm check:knowledge`    | 人工维护文档的来源变化                   |
+| `pnpm check:generated`    | 数据库结构文档是否过期，需先完成必要构建 |
+| `pnpm test:harness`       | 工程检查器和运行工具的行为测试           |
+| `pnpm docs:generate`      | 完成必要构建并生成数据库结构文档         |
 
 工程导航见 [AGENTS.md](AGENTS.md)，完整知识索引见 [docs/README.md](docs/README.md)。
 复杂任务通过项目级 OpenSpec 管理，使用 `pnpm exec openspec` 调用固定版本。

@@ -1,6 +1,6 @@
 # 首次点餐流程
 
-这是现有 H5 的用户旅程导航，行为约束以 [菜单](menu.md)、[订单](ordering.md)、[图片与导入](food-media.md) 对应的 OpenSpec 来源为准。
+这是现有 H5 的用户旅程导航，行为约束以 [菜单](../../openspec/specs/menu/spec.md)、[订单](../../openspec/specs/ordering/spec.md)、[图片与导入](../../openspec/specs/food-media/spec.md) 对应的 OpenSpec 来源为准。
 
 ## 业务脑图
 

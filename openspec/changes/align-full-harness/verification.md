@@ -48,3 +48,20 @@
 | 任务                     | 首次整体验收                       | 验收后返工           | 人工干预 | 可取得的成本                                          |
 | ------------------------ | ---------------------------------- | -------------------- | -------- | ----------------------------------------------------- |
 | 11 月 24 日 Harness 整改 | 本地首次失败，复跑通过。远端待验收 | 1 轮，修正清理控制流 | 0 次     | 两次本地完整验收累计 370.4 秒。费用和总交付周期未采集 |
+
+## 托管 Windows 作业分工
+
+- 提交 `7acf808` 的 [远端 CI](https://github.com/LingC001/ScanOrder2.0/actions/runs/45381486448) 已结束。Ubuntu 基础、PostgreSQL 集成、Chromium 和隔离遥测通过。Windows 基础及汇总检查失败。
+- [Windows 日志](https://github.com/LingC001/ScanOrder2.0/actions/runs/45381486448/job/138401353298) 显示数据库初始化成功，PostgreSQL 拒绝在管理员权限下启动。数据库文档校验由 Ubuntu 基础作业承担，两端基础结果仍参与汇总。
+- 本地以 `CI=true` 执行 Windows CI 入口和默认基础入口，分别通过 11 步和 12 步，两份报告的步骤仅相差 `check:generated`，后者确实重放了真实 PostgreSQL 迁移。报告为 `.local/harness/2026-11-24T11-34-22-285Z-33828-windows-ci.md` 和 `.local/harness/2026-11-24T11-35-56-219Z-70664-base.md`。
+- 工作流回归、严格规范检查和知识来源检查均通过。新的作业分工待远端运行复验。
+
+## 重构产品文档目录
+
+- `docs/product/new-user-onboarding.md` 与迁移前基线逐行比对一致，仅将 3 处规范链接更新到 `openspec/specs/`。`docs/tech-debt-tracker.md` 已迁至 `docs/` 根目录并修正内部相对链接，旧 `docs/product-specs/` 与 `docs/exec-plans/` 目录已移除。
+- `docs/README.md` 登记 `docs/product/` 目录并直连 OpenSpec 正式规范、活动变更与历史归档。`tests/harness/docs.test.mjs` 与 `tests/harness/knowledge.test.mjs` 验证了目录内新增原稿免逐篇登记、原稿内失效链接失败、未登记工程文档失败、原稿免除源码指纹以及技术债台账来源校验。
+- 本地执行 `pnpm docs:generate` 后仅生成 `docs/generated/db-schema.md`。随后执行 `pnpm verify` 全部 12 步退出码均为 0，报告保存在 `.local/harness/2026-11-24T12-12-35-813Z-66664-base.md`。
+
+| 任务             | 首次整体验收               | 验收后返工 | 人工干预 | 可取得的成本                                       |
+| ---------------- | -------------------------- | ---------- | -------- | -------------------------------------------------- |
+| 重构产品文档目录 | 本地基础验证 12 步一次通过 | 0 轮       | 0 次     | 单次本地 `verify` 耗时 79.1 秒。费用与总周期未采集 |

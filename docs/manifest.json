@@ -32,7 +32,7 @@
         "scripts/harness/settings.json",
         "scripts/harness/workspace.mjs"
       ],
-      "reviewedDigest": "42eac210111b906f14350fe62d8753c5649f1925577f77eb6d550dd31f595267"
+      "reviewedDigest": "8274bb9117054ffb6bb1ac28004072476be9798297cd197820bb4f6c4e9cffac"
     },
     "docs/PRODUCT_SENSE.md": {
       "sources": [
@@ -52,7 +52,7 @@
         "scripts/harness/settings.json",
         "tests/e2e/ordering.spec.ts"
       ],
-      "reviewedDigest": "54f478bb94c30b0dd4169df31413fb19ad64b56bec8e4461cbed34195e40f271"
+      "reviewedDigest": "e0167cefc5f3a5987f420af37c956cb7a724bd83835a1bad3e626a7f7dadba2b"
     },
     "docs/RELIABILITY.md": {
       "sources": [
@@ -69,7 +69,7 @@
         "scripts/with-postgres.mjs",
         "playwright.config.ts"
       ],
-      "reviewedDigest": "59915c1b841d383dfbaef41106cf5c955049282727f4a6304a32b76d0d22cb25"
+      "reviewedDigest": "2f5bfa8f57d7bfe640d72f731f62d4ee372cd15eca99e9e9739e05e5d8493893"
     },
     "docs/SECURITY.md": {
       "sources": [
@@ -84,17 +84,17 @@
     },
     "docs/design-docs/index.md": {
       "sources": ["ARCHITECTURE.md", "docs/design-docs/adr-template.md"],
-      "reviewedDigest": "e22598e9d381df2bf0f694e5294504ee275cb65d3d004870dd6e2cdedbf5a3b0"
+      "reviewedDigest": "f593374940c7e7e44d38328320bd0c4503bf2f765fb2c831af3b5c1319f8a540"
     },
     "docs/design-docs/core-beliefs.md": {
       "sources": ["AGENTS.md", "ARCHITECTURE.md"],
-      "reviewedDigest": "8fb78033163cba3bf3826b8102c2905a3cf1407e49b0a64892e73c18c94fd547"
+      "reviewedDigest": "5a9282facf4d3e732b257850efdcac84cd443b501fa33e2937025ff2dcc98478"
     },
     "docs/design-docs/runtime-observability.md": {
       "sources": ["scripts/harness/runtime-worker.mjs", "apps/api/src/telemetry/bootstrap.ts"],
       "reviewedDigest": "5356a9ead22cd66000ae1f4f8ebf4992877e921afeac2af1816b6797fe8f2ca1"
     },
-    "docs/exec-plans/tech-debt-tracker.md": {
+    "docs/tech-debt-tracker.md": {
       "sources": [
         ".env.example",
         "README.md",
@@ -104,20 +104,7 @@
         "docs/PLANS.md",
         "docs/QUALITY_SCORE.md"
       ],
-      "reviewedDigest": "ab65dff2d25d189c5ed9d880ca22183ce06902bca2d61768565d6543ebc529f9"
-    },
-    "docs/product-specs/new-user-onboarding.md": {
-      "sources": [
-        "apps/web/src/App.tsx",
-        "apps/web/src/cart.ts",
-        "apps/web/src/pages/Choose.tsx",
-        "apps/web/src/pages/Entry.tsx",
-        "apps/web/src/pages/SubmitOrder.tsx",
-        "apps/web/src/pages/admin/AdminApp.tsx",
-        "openspec/specs/food-media/spec.md",
-        "tests/e2e/ordering.spec.ts"
-      ],
-      "reviewedDigest": "013df71555d60959f7578f400c8e7ae893c52cdee5df5945488da5e7731940e8"
+      "reviewedDigest": "fd03b3b7345a725a8d3adaf3a6e8e4b56e2442e7d519c186e0c0dd54ecd9a235"
     },
     "docs/references/design-system-reference-llms.txt": {
       "sources": ["apps/web/src/styles.css", "apps/web/src/components.tsx"],
