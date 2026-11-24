@@ -17,6 +17,70 @@ const browserGlobals = new Set([
   'localStorage',
   'sessionStorage',
 ]);
+const apiDomains = new Set(['auth', 'categories', 'foods', 'orders']);
+const apiPublicEntries = new Set([
+  'auth/index.ts',
+  'auth/password.ts',
+  'categories/index.ts',
+  'foods/index.ts',
+  'orders/index.ts',
+]);
+const apiPrivateImports = new Map([
+  [
+    'database/data-source.ts',
+    [
+      'auth/entities/session.entity.ts',
+      'categories/entities/category.entity.ts',
+      'foods/entities/food.entity.ts',
+      'orders/entities/order.entity.ts',
+      'orders/entities/order-item.entity.ts',
+    ],
+  ],
+  [
+    'import/foods-importer.ts',
+    [
+      'categories/entities/category.entity.ts',
+      'foods/entities/food.entity.ts',
+      'foods/dto/create-food.dto.ts',
+    ],
+  ],
+  ['categories/entities/category.entity.ts', ['foods/entities/food.entity.ts']],
+  ['foods/entities/food.entity.ts', ['categories/entities/category.entity.ts']],
+  ['orders/entities/order-item.entity.ts', ['foods/entities/food.entity.ts']],
+]);
+
+function apiModuleBoundary(from, to) {
+  const domain = to.split('/')[0];
+  if (
+    apiDomains.has(domain) &&
+    domain !== from.split('/')[0] &&
+    !apiPublicEntries.has(to) &&
+    !apiPrivateImports.get(from)?.includes(to)
+  ) {
+    return `跨模块引用 ${to}，请使用 ${domain}/index.ts 的公开入口。`;
+  }
+}
+
+function checkSourceCycles(graph, issues) {
+  const visited = new Set();
+  const stack = [];
+  function visit(path) {
+    if (visited.has(path)) return;
+    visited.add(path);
+    stack.push(path);
+    for (const { target, location } of graph.get(path)) {
+      const start = stack.indexOf(target);
+      if (start >= 0) {
+        const cycle = [...stack.slice(start), target].join(' → ');
+        issues.push(`${location} [源码依赖循环] ${cycle}，请调整依赖方向。`);
+      } else {
+        visit(target);
+      }
+    }
+    stack.pop();
+  }
+  for (const path of graph.keys()) visit(path);
+}
 
 export function workspaces(directory) {
   return ['apps', 'packages'].flatMap((group) => {
@@ -80,8 +144,13 @@ function imports(source) {
         (ts.isIdentifier(node.expression) && node.expression.text === 'require'))
     )
       value = node.arguments[0];
-    if (value && ts.isStringLiteralLike(value))
-      references.push({ specifier: value.text, node: value });
+    if (value && ts.isStringLiteralLike(value)) {
+      const typeOnly =
+        ts.isImportTypeNode(node) ||
+        (ts.isImportDeclaration(node) && node.importClause?.isTypeOnly) ||
+        ((ts.isExportDeclaration(node) || ts.isImportEqualsDeclaration(node)) && node.isTypeOnly);
+      references.push({ specifier: value.text, node: value, typeOnly });
+    }
     ts.forEachChild(node, visit);
   };
   visit(source);
@@ -160,28 +229,45 @@ export function checkArchitecture(directory = root) {
       );
       continue;
     }
-    const sources = files(resolve(pkg.path, 'src')).filter(
+    const sourceRoot = resolve(pkg.path, 'src');
+    const sources = files(sourceRoot).filter(
       (path) => /\.[cm]?tsx?$/.test(path) && !path.endsWith('.d.ts'),
     );
+    const sourceGraph = new Map(sources.map((path) => [displayPath(path, directory), []]));
     const program = ts.createProgram(sources, { ...parsed.options, noEmit: true });
     const checker = program.getTypeChecker();
     for (const path of sources) {
       const source = program.getSourceFile(path);
       if (!source) continue;
-      const add = (node, rule, message) => {
+      const from = displayPath(path, directory);
+      const location = (node) => {
         const position = source.getLineAndCharacterOfPosition(node.getStart(source));
-        issues.push(
-          `${displayPath(path, directory)}:${position.line + 1}:${position.character + 1} [${rule}] ${message}`,
-        );
+        return `${from}:${position.line + 1}:${position.character + 1}`;
       };
-      for (const { specifier, node } of imports(source)) {
+      const add = (node, rule, message) => {
+        issues.push(`${location(node)} [${rule}] ${message}`);
+      };
+      for (const { specifier, node, typeOnly } of imports(source)) {
         const namedTarget = packages.find(
           (candidate) => specifier === candidate.name || specifier.startsWith(`${candidate.name}/`),
         );
         const resolved = ts.resolveModuleName(specifier, path, parsed.options, ts.sys)
           .resolvedModule?.resolvedFileName;
+        const resolvedPath = resolved && realpathSync(resolved);
+        const resolvedName = resolvedPath && displayPath(resolvedPath, directory);
+        if (sourceGraph.has(resolvedName)) {
+          if (!typeOnly)
+            sourceGraph.get(from).push({ target: resolvedName, location: location(node) });
+          if (pkg.name === '@scanorder/api') {
+            const problem = apiModuleBoundary(
+              displayPath(path, sourceRoot),
+              displayPath(resolvedPath, sourceRoot),
+            );
+            if (problem) add(node, '业务模块入口', problem);
+          }
+        }
         const target =
-          (resolved && packageFor(realpathSync(resolved), packages)) ??
+          (resolvedPath && packageFor(resolvedPath, packages)) ??
           namedTarget ??
           (specifier.startsWith('.')
             ? packageFor(resolve(dirname(path), specifier), packages)
@@ -252,6 +338,7 @@ export function checkArchitecture(directory = root) {
         visit(source);
       }
     }
+    checkSourceCycles(sourceGraph, issues);
   }
   const active = new Set();
   const visited = new Set();

@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseUUIDPipe, Req, UseGuards } from '@nestjs/common';
-import { CustomerAuthGuard } from '../auth/auth.guard.js';
-import type { AuthenticatedRequest } from '../auth/auth.service.js';
+import { CustomerAuthGuard } from '../auth/index.js';
+import type { AuthenticatedRequest } from '../auth/index.js';
 import { OrdersService } from './orders.service.js';
 
 @Controller('customer/orders')

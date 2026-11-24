@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import type { Relation } from 'typeorm';
 import type { OrderStatus } from '@scanorder/contracts';
 import { integerTransformer } from '../../database/transformers/integer.transformer.js';
-import { OrderItemEntity } from './order-item.entity.js';
+import type { OrderItemEntity } from './order-item.entity.js';
 
 @Entity('orders')
 export class OrderEntity {
@@ -18,6 +18,6 @@ export class OrderEntity {
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) createdAt!: Date;
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' }) updatedAt!: Date;
 
-  @OneToMany(() => OrderItemEntity, (item) => item.order, { cascade: ['insert'] })
+  @OneToMany('OrderItemEntity', (item: OrderItemEntity) => item.order, { cascade: ['insert'] })
   items!: Relation<OrderItemEntity[]>;
 }

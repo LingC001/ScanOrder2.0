@@ -2,6 +2,10 @@
 
 基于原 ScanOrder 重构的 pnpm monorepo。前端使用 React 19、TypeScript、Vite 8、Tailwind CSS 4，后端使用 NestJS 12、TypeORM、PostgreSQL 18。
 
+## 项目介绍
+
+这是个人AI Coding 学习项目，业务为点餐系统，包含客户端和商家管理端，是基于TS的全栈项目。
+
 ## 现有功能
 
 - 人数选择、商家信息、推荐菜品、分类选菜、图片预览。

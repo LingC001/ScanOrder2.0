@@ -10,7 +10,7 @@ import { randomUUID } from 'node:crypto';
 import type { CreateFoodInput, Food, Page } from '@scanorder/contracts';
 import { QueryFailedError } from 'typeorm';
 import type { Repository } from 'typeorm';
-import { CategoryEntity } from '../categories/entities/category.entity.js';
+import { CategoriesService } from '../categories/index.js';
 import { ImageStorageService } from '../storage/image-storage.service.js';
 import { InvalidImageError } from '../storage/image.js';
 import type { FoodQueryDto } from './dto/food-query.dto.js';
@@ -29,7 +29,7 @@ export class FoodsService {
 
   constructor(
     @InjectRepository(FoodEntity) private readonly foods: Repository<FoodEntity>,
-    @InjectRepository(CategoryEntity) private readonly categories: Repository<CategoryEntity>,
+    private readonly categories: CategoriesService,
     private readonly storage: ImageStorageService,
   ) {}
 
@@ -164,7 +164,7 @@ export class FoodsService {
   }
 
   private async requireCategory(id: string): Promise<void> {
-    if (!(await this.categories.existsBy({ id }))) throw new BadRequestException('所选分类不存在');
+    if (!(await this.categories.exists(id))) throw new BadRequestException('所选分类不存在');
   }
 
   private async requireFood(id: string): Promise<FoodEntity> {

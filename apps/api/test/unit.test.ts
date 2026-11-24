@@ -8,6 +8,7 @@ import { validateSync } from 'class-validator';
 import type { Repository } from 'typeorm';
 import { workspaceRoot } from '../src/config/index.js';
 import { CategoryEntity } from '../src/categories/entities/category.entity.js';
+import { CategoriesService } from '../src/categories/index.js';
 import { CreateFoodDto } from '../src/foods/dto/create-food.dto.js';
 import { FoodEntity } from '../src/foods/entities/food.entity.js';
 import { FoodsService } from '../src/foods/foods.service.js';
@@ -125,7 +126,7 @@ test('图片写入后数据库保存失败，会清理本次上传文件', async
     } as unknown as Repository<CategoryEntity>;
     const service = new FoodsService(
       repository,
-      categoryRepository,
+      new CategoriesService(categoryRepository),
       new ImageStorageService(directory),
     );
     const image = await readFile(resolve(workspaceRoot, 'examples/images/纸巾.png'));

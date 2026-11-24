@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import type { DynamicModule } from '@nestjs/common';
 import type { DataSource } from 'typeorm';
-import { AuthModule } from './auth/auth.module.js';
-import { CategoriesModule } from './categories/categories.module.js';
+import { AuthModule } from './auth/index.js';
+import { CategoriesModule } from './categories/index.js';
 import { AppConfigModule } from './config/index.js';
 import type { AppConfig } from './config/index.js';
 import { DatabaseModule } from './database/database.module.js';
-import { FoodsModule } from './foods/foods.module.js';
-import { OrdersModule } from './orders/orders.module.js';
+import { FoodsModule } from './foods/index.js';
+import { OrdersModule } from './orders/index.js';
 
 interface AppModuleOptions {
   config: AppConfig;

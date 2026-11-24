@@ -13,7 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MerchantAuthGuard } from '../auth/auth.guard.js';
+import { MerchantAuthGuard } from '../auth/index.js';
 import { MAX_IMAGE_SIZE } from '../storage/image.js';
 import { FoodFormDto } from './dto/food-form.dto.js';
 import { FoodQueryDto } from './dto/food-query.dto.js';

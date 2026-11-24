@@ -51,3 +51,28 @@ export function postgres(databaseDir, port) {
   });
   return { instance, logs };
 }
+
+export async function startTemporaryDatabase({ instance, logs }) {
+  let phase = '初始化';
+  try {
+    await instance.initialise();
+    phase = '启动';
+    await instance.start();
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : (error ?? '进程未返回错误对象');
+    const exitCode = instance.process?.exitCode;
+    const signal = instance.process?.signalCode;
+    const state = [
+      exitCode == null ? '' : `退出码 ${exitCode}`,
+      signal ? `信号 ${signal}` : '',
+    ].filter(Boolean);
+    const diagnostics = logs.slice(-8).join('\n').trim();
+    throw new Error(
+      [
+        `临时 PostgreSQL ${phase}失败（${[...state, reason].join('，')}）`,
+        diagnostics || '未收到数据库进程日志。',
+      ].join('\n'),
+      { cause: error },
+    );
+  }
+}

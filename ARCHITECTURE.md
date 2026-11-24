@@ -24,8 +24,10 @@ PostgreSQL 18；本地图片存储
 - `config` 提供环境配置；`database` 装配 TypeORM、实体、迁移和整数转换器。
 - `auth` 集中维护商家与顾客会话；`categories`、`foods` 和 `orders` 各自拥有控制器、DTO、服务、实体及映射。控制器处理 HTTP、守卫和 DTO，把持久化与事务交给服务。
 - `storage` 负责图片内容校验、命名和文件读写；`import` 复用菜品实体、DTO 与存储能力。
-- 根模块组合各模块。数据库注册实体、订单关联菜品实体、订单实体之间的关系均为现有合法依赖，不套用禁止所有文件循环的规则。
-- `check:architecture` 自动约束包边界、平台依赖和控制器对实体／ORM 的直接依赖；其余业务约束由类型与行为测试验证。
+- 根模块和其他业务模块通过 `auth`、`categories`、`foods`、`orders` 的 `index.ts` 装配模块或复用公开能力。配置单独使用无框架依赖的 `auth/password.ts` 做口令格式校验。
+- 菜品通过分类服务校验归属，分类通过自身 ORM 关联统计商品，删除约束由数据库外键保证。订单调用菜品公开查询，在原事务内读取在售菜品快照。
+- 允许数据源注册实体、批量导入复用指定分类和菜品实体与菜品 DTO，以及分类与菜品、订单明细与菜品之间的 ORM 关联。例外按来源和目标文件登记。TypeORM 的分类反向关系和订单明细集合使用实体名及纯类型引用，避免加载时成环。
+- `check:architecture` 约束包边界、平台依赖、控制器持久化依赖、后端公开入口和各工作区 `src` 的运行时循环。纯类型引用仍需遵守模块边界。
 
 [服务入口](apps/api/src/main.ts) 启动 [应用工厂](apps/api/src/app.ts) 创建的应用，该工厂注册全局校验和图片静态路由，集成测试通过同一工厂注入隔离数据库。模块组合见 [AppModule](apps/api/src/app.module.ts)。旧菜品以 `legacyId` 匹配已有记录，入口见 [导入实现](apps/api/src/import/foods-importer.ts)。
 

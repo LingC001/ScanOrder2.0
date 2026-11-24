@@ -8,7 +8,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { MerchantAuthGuard } from '../auth/auth.guard.js';
+import { MerchantAuthGuard } from '../auth/index.js';
 import { OrderQueryDto } from './dto/order-query.dto.js';
 import { OrderStatusDto } from './dto/order-status.dto.js';
 import { OrdersService } from './orders.service.js';

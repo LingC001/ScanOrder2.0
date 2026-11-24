@@ -1,5 +1,5 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { CustomerAuthGuard } from '../auth/auth.guard.js';
+import { CustomerAuthGuard } from '../auth/index.js';
 import { FoodsService } from './foods.service.js';
 
 @Controller('foods')

@@ -24,13 +24,15 @@
     "docs/PLANS.md": {
       "sources": [
         "AGENTS.md",
+        ".github/workflows/harness.yml",
         "package.json",
         "openspec/config.yaml",
+        "scripts/harness/check-spec.mjs",
         "scripts/harness/verify.mjs",
         "scripts/harness/settings.json",
         "scripts/harness/workspace.mjs"
       ],
-      "reviewedDigest": "3075823bf8d58621ffc10b489e92483d3542ed424be7073a06a7546f95bfcafc"
+      "reviewedDigest": "42eac210111b906f14350fe62d8753c5649f1925577f77eb6d550dd31f595267"
     },
     "docs/PRODUCT_SENSE.md": {
       "sources": [
@@ -46,16 +48,20 @@
         "apps/api/test/integration.test.ts",
         "apps/api/test/unit.test.ts",
         "openspec/changes/align-full-harness/verification.md",
+        "scripts/harness/check-architecture.mjs",
         "scripts/harness/settings.json",
         "tests/e2e/ordering.spec.ts"
       ],
-      "reviewedDigest": "e9bc64e393980e0d08f0145d807714604d1c624beeb999a91fea72bcc4cbac79"
+      "reviewedDigest": "54f478bb94c30b0dd4169df31413fb19ad64b56bec8e4461cbed34195e40f271"
     },
     "docs/RELIABILITY.md": {
       "sources": [
         "apps/api/src/orders/orders.service.ts",
         "apps/api/src/app.ts",
         "compose.yaml",
+        ".github/workflows/harness.yml",
+        "scripts/harness/generate-docs.mjs",
+        "scripts/postgres.mjs",
         "scripts/harness/runtime.mjs",
         "scripts/harness/observe.mjs",
         "scripts/harness/runtime-worker.mjs",
@@ -63,7 +69,7 @@
         "scripts/with-postgres.mjs",
         "playwright.config.ts"
       ],
-      "reviewedDigest": "bfc8729cde9626a29c5c3fdb382a98726b0e8a03c4987a0e99ce5abf5c5ddc21"
+      "reviewedDigest": "59915c1b841d383dfbaef41106cf5c955049282727f4a6304a32b76d0d22cb25"
     },
     "docs/SECURITY.md": {
       "sources": [
@@ -78,19 +84,27 @@
     },
     "docs/design-docs/index.md": {
       "sources": ["ARCHITECTURE.md", "docs/design-docs/adr-template.md"],
-      "reviewedDigest": "3357660eca6a529d1741de4e888603651b0657215a138ec2cb7d3a7645a2c4a1"
+      "reviewedDigest": "e22598e9d381df2bf0f694e5294504ee275cb65d3d004870dd6e2cdedbf5a3b0"
     },
     "docs/design-docs/core-beliefs.md": {
       "sources": ["AGENTS.md", "ARCHITECTURE.md"],
-      "reviewedDigest": "e0162629f0117bc23711d4a7ccb6b94a24eaff6ec7bf002da92a800bb7929764"
+      "reviewedDigest": "8fb78033163cba3bf3826b8102c2905a3cf1407e49b0a64892e73c18c94fd547"
     },
     "docs/design-docs/runtime-observability.md": {
       "sources": ["scripts/harness/runtime-worker.mjs", "apps/api/src/telemetry/bootstrap.ts"],
       "reviewedDigest": "5356a9ead22cd66000ae1f4f8ebf4992877e921afeac2af1816b6797fe8f2ca1"
     },
     "docs/exec-plans/tech-debt-tracker.md": {
-      "sources": [".env.example", "README.md", "compose.yaml", "apps/api/src/app.ts"],
-      "reviewedDigest": "e55126e75528dec22dcf1c3dcf41bd26aec328ba27a7990bfbb0a3ab8cb5bb93"
+      "sources": [
+        ".env.example",
+        "README.md",
+        "compose.yaml",
+        "apps/api/src/app.ts",
+        ".github/workflows/harness.yml",
+        "docs/PLANS.md",
+        "docs/QUALITY_SCORE.md"
+      ],
+      "reviewedDigest": "ab65dff2d25d189c5ed9d880ca22183ce06902bca2d61768565d6543ebc529f9"
     },
     "docs/product-specs/new-user-onboarding.md": {
       "sources": [
@@ -130,7 +144,7 @@
         "packages/contracts/package.json",
         "packages/contracts/src/index.ts"
       ],
-      "reviewedDigest": "b9767d4653f32710b1fb1e9c60eff6ad5fddf2c1c63d791677830291f6967f2e"
+      "reviewedDigest": "198558ba9ae817154f978e68f5ae29fa557c78097aebe869de272fd6bade5f18"
     }
   }
 }

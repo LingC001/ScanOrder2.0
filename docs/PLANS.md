@@ -47,6 +47,14 @@ pnpm exec openspec validate --all --strict --no-interactive
 
 CI 每次 push、PR 或手动触发均执行完整自动检查。自动浏览器截图只证明自动化步骤执行，不替代人工对照设计稿。
 
+`pnpm check:spec` 执行严格校验，并将与当前正式规范冲突的归档提示视为失败。修改已有要求时，从正式规范复制完整要求及场景后编写增量。归档仍需核对任务、实测证据和合并后的正式规范。
+
+### 主分支合入
+
+1. 通过 PR 提交变更，在 PR 中记录待合入版本、相关验证和链接，确认该版本对应的 **Harness 合入检查** 已通过。汇总检查覆盖 Windows 和 Ubuntu 基础验证、PostgreSQL、Chromium 和隔离遥测。
+2. 数据迁移、权限或身份边界、生产配置或发布、合入规则变更需在 PR 中记录风险、回退办法及维护者的人工批准。变更实质更新后重新确认受影响的批准和检查。
+3. 当前 GitHub 私有仓库的套餐不支持规则集，维护者须按以上流程人工把关。仓库支持主分支保护后，要求 PR 与必需状态检查 **Harness 合入检查**，并启用人工审批。核对失败检查和缺少审批时的实际阻止结果，再登记启用。
+
 ### 测试入口
 
 - 共享包的金额工具测试见 [contracts/test](../packages/contracts/test)。
@@ -64,7 +72,7 @@ CI 每次 push、PR 或手动触发均执行完整自动检查。自动浏览器
 
 维护使用 `$harness-maintain`，先用 `pnpm harness:workspace create` 创建源码快照和独立 worktree，在其中完成修改与相关验证，再用 `pnpm harness:workspace patch 编号` 导出相对快照的本轮补丁。实际环境文件、上传数据和运行目录排除在快照外。补丁不自动应用回主工作区，提交推送由用户控制。
 
-本机周期维护在手动演练通过后启用，按工作日北京时间 09:00 运行；每轮最多一个明确问题、两轮修复和三十分钟。历史验收入口见 [质量记录](QUALITY_SCORE.md)，当前启用与实际触发状态以原生自动化记录为准。
+本机周期维护启用时按工作日北京时间 09:00 运行，每轮最多一个明确问题、两轮修复和三十分钟。暂停时记录已知原因、状态和恢复条件。经用户授权恢复后核对首次触发、实际报告及补丁状态。当前状态和任务度量见[质量记录](QUALITY_SCORE.md)。
 
 | 技能                | 用途                                                     |
 | ------------------- | -------------------------------------------------------- |
@@ -73,4 +81,4 @@ CI 每次 push、PR 或手动触发均执行完整自动检查。自动浏览器
 | `$harness-maintain` | 在独立 worktree 维护知识、修复可复现小问题并交付本地补丁 |
 | `$harness-evaluate` | 保存缺陷修复前后证据，完成真实 Agent 演练与独立代码评审  |
 
-依据：`openspec/config.yaml`、`scripts/harness/verify.mjs`、`scripts/harness/settings.json`、`scripts/harness/workspace.mjs`。
+依据包括 `openspec/config.yaml`、`.github/workflows/harness.yml`、`scripts/harness/check-spec.mjs`、`scripts/harness/verify.mjs`、`scripts/harness/settings.json` 和 `scripts/harness/workspace.mjs`。

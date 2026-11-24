@@ -137,3 +137,36 @@ test('声明清单中的跨应用依赖和工作区包循环被拒绝', (t) => {
   );
   assert.ok(issues.some((issue) => issue.includes('[包依赖循环]')));
 });
+
+test('后端公开入口、明确登记的 ORM 依赖和纯类型关联通过', (t) => {
+  const { directory } = architectureFixture(t, {
+    'apps/api/src/categories/index.ts': 'export const categoryExists = () => true;',
+    'apps/api/src/foods/foods.service.ts':
+      'import { categoryExists } from "../categories/index.js";',
+    'apps/api/src/categories/entities/category.entity.ts':
+      'import type { Food } from "../../foods/entities/food.entity.js"; export interface Category { foods: Food[] }',
+    'apps/api/src/foods/entities/food.entity.ts':
+      'import "../../categories/entities/category.entity.js"; export interface Food { id: string }',
+    'apps/api/src/database/data-source.ts': 'import "../foods/entities/food.entity.js";',
+  });
+  assert.deepEqual(checkArchitecture(directory), []);
+});
+
+test('后端私有入口和应用内运行时循环返回具体位置', (t) => {
+  const { directory } = architectureFixture(t, {
+    'apps/api/src/foods/entities/food.entity.ts': 'export interface Food { id: string }',
+    'apps/api/src/categories/categories.service.ts':
+      'import type { Food } from "../foods/entities/food.entity.js";',
+    'apps/api/src/foods/a.ts': 'import "./b.js";',
+    'apps/api/src/foods/b.ts': 'export * from "./a.js";',
+  });
+  const issues = checkArchitecture(directory);
+  assert.ok(
+    issues.some(
+      (issue) => issue.includes('categories.service.ts:1:') && issue.includes('[业务模块入口]'),
+    ),
+  );
+  assert.ok(
+    issues.some((issue) => issue.includes('[源码依赖循环]') && issue.includes('foods/a.ts')),
+  );
+});

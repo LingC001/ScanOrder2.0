@@ -4,7 +4,13 @@ import { dirname, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { format } from 'prettier';
 import { root, files, isMain } from './common.mjs';
-import { freePort, postgres, testDirectory, removeLocalDirectory } from '../postgres.mjs';
+import {
+  freePort,
+  postgres,
+  testDirectory,
+  removeLocalDirectory,
+  startTemporaryDatabase,
+} from '../postgres.mjs';
 import { stopDatabase } from './runtime-cleanup.mjs';
 
 export function planViews(directory = root) {
@@ -55,11 +61,12 @@ export function productViews(directory = root) {
 export async function databaseView(directory = root) {
   const temporary = await testDirectory('schema-');
   const port = await freePort();
-  const database = postgres(resolve(temporary, 'database'), port).instance;
+  const temporaryDatabase = postgres(resolve(temporary, 'database'), port);
+  const database = temporaryDatabase.instance;
   let source;
+  let result;
   try {
-    await database.initialise();
-    await database.start();
+    await startTemporaryDatabase(temporaryDatabase);
     await database.createDatabase('scanorder_schema');
     const { createDataSource } = await import(
       pathToFileURL(resolve(directory, 'apps/api/dist/database/data-source.js')).href
@@ -109,12 +116,28 @@ export async function databaseView(directory = root) {
         )
         .join('\n') +
       '\n';
-    return text;
-  } finally {
-    if (source?.isInitialized) await source.destroy();
+    result = { text };
+  } catch (error) {
+    result = { error };
+  }
+  const cleanupErrors = [];
+  if (source?.isInitialized)
+    await source.destroy().catch((error) => cleanupErrors.push(String(error)));
+  try {
     await stopDatabase(database);
     await removeLocalDirectory(temporary);
+  } catch (error) {
+    cleanupErrors.push(String(error));
   }
+  const cleanupFailure = cleanupErrors.length
+    ? `清理临时数据库失败（${cleanupErrors.join('；')}）`
+    : undefined;
+  if ('error' in result) {
+    console.error(cleanupFailure ?? '已清理本轮临时数据库。');
+    throw result.error;
+  }
+  if (cleanupFailure) throw new Error(cleanupFailure);
+  return result.text;
 }
 
 export async function generate(mode, directory = root) {
@@ -143,7 +166,7 @@ if (isMain(import.meta.url)) {
     await generate(process.argv[2] ?? 'check');
     console.log('生成文档：通过');
   } catch (error) {
-    console.error(error.message);
+    console.error(error instanceof Error ? error.message : String(error));
     code = 1;
   }
   process.exit(code);

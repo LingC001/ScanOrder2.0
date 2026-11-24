@@ -14,9 +14,9 @@ import type {
   Page,
   UpdateOrderStatusInput,
 } from '@scanorder/contracts';
-import { DataSource, In } from 'typeorm';
+import { DataSource } from 'typeorm';
 import type { Repository } from 'typeorm';
-import { FoodEntity } from '../foods/entities/food.entity.js';
+import { findActiveFoodSnapshots } from '../foods/index.js';
 import type { OrderQueryDto } from './dto/order-query.dto.js';
 import { OrderEntity } from './entities/order.entity.js';
 import { OrderItemEntity } from './entities/order-item.entity.js';
@@ -45,9 +45,7 @@ export class OrdersService {
     const ids = input.items.map((item) => item.foodId);
     if (new Set(ids).size !== ids.length) throw new BadRequestException('同一种菜品请合并数量');
     return this.source.transaction(async (manager) => {
-      const foods = await manager.find(FoodEntity, {
-        where: { id: In(ids), status: 'active' },
-      });
+      const foods = await findActiveFoodSnapshots(manager, ids);
       const foodMap = new Map(foods.map((food) => [food.id, food]));
       if (foods.length !== ids.length)
         throw new BadRequestException('部分菜品已下架或不存在，请返回菜单重新选择');

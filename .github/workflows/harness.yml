@@ -157,3 +157,24 @@ jobs:
           include-hidden-files: true
           if-no-files-found: warn
           retention-days: 14
+
+  merge-gate:
+    name: Harness 合入检查
+    needs: [quality, integration, e2e, observability]
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: 汇总必需作业结果
+        env:
+          HARNESS_JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          node --input-type=module <<'NODE'
+          const jobs = Object.entries(JSON.parse(process.env.HARNESS_JOB_RESULTS));
+          if (jobs.length === 0) throw new Error('缺少必需作业结果。');
+          for (const [name, job] of jobs) {
+            console.log(`${name} = ${job.result}`);
+            if (job.result !== 'success') process.exitCode = 1;
+          }
+          NODE
