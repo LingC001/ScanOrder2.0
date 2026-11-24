@@ -93,7 +93,16 @@ test('CI 配置包含触发器、跨平台基础检查与隔离回归入口', ()
   const workflow = parse(readFileSync(resolve(root, '.github/workflows/harness.yml'), 'utf8'));
   assert.deepEqual(Object.keys(workflow.on).sort(), ['pull_request', 'push', 'workflow_dispatch']);
   assert.deepEqual(workflow.jobs.quality.strategy.matrix.os, ['ubuntu-24.04', 'windows-2025']);
-  assert.ok(workflow.jobs.quality.steps.some((item) => item.run === 'pnpm verify'));
+  const qualitySteps = workflow.jobs.quality.steps.filter((item) =>
+    ['pnpm verify', 'node scripts/harness/verify.mjs windows-ci'].includes(item.run),
+  );
+  assert.deepEqual(
+    qualitySteps.map(({ run, if: condition }) => [run, condition]),
+    [
+      ['pnpm verify', "runner.os == 'Linux'"],
+      ['node scripts/harness/verify.mjs windows-ci', "runner.os == 'Windows'"],
+    ],
+  );
   for (const name of ['integration', 'e2e']) {
     const job = workflow.jobs[name];
     assert.equal(job['runs-on'], 'ubuntu-24.04');

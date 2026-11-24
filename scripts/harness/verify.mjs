@@ -3,45 +3,31 @@ import { resolve } from 'node:path';
 import { root } from './common.mjs';
 import { runSteps, writeReport } from './runner.mjs';
 
+const crossPlatform = [
+  'harness:doctor',
+  'check:docs',
+  'check:architecture',
+  'check:spec',
+  'test:harness',
+  'typecheck',
+  'lint',
+  'format:check',
+  'test',
+  'build',
+  'check:knowledge',
+];
+const base = [...crossPlatform, 'check:generated'];
 const modes = {
-  base: [
-    'harness:doctor',
-    'check:docs',
-    'check:architecture',
-    'check:spec',
-    'test:harness',
-    'typecheck',
-    'lint',
-    'format:check',
-    'test',
-    'build',
-    'check:knowledge',
-    'check:generated',
-  ],
-  full: [
-    'harness:doctor',
-    'check:docs',
-    'check:architecture',
-    'check:spec',
-    'test:harness',
-    'typecheck',
-    'lint',
-    'format:check',
-    'test',
-    'build',
-    'check:knowledge',
-    'check:generated',
-    'test:integration',
-    'test:e2e',
-    'harness:eval',
-  ],
+  base,
+  'windows-ci': crossPlatform,
+  full: [...base, 'test:integration', 'test:e2e', 'harness:eval'],
   integration: ['test:integration'],
   e2e: ['test:e2e'],
   observability: ['harness:eval'],
 };
 const mode = process.argv[2] ?? 'base';
 if (!Object.hasOwn(modes, mode)) {
-  console.error('未知验证模式，请使用 base、full、integration 或 e2e。');
+  console.error(`未知验证模式，请使用 ${Object.keys(modes).join('、')}。`);
   process.exitCode = 1;
 } else {
   const startedAt = new Date().toISOString();

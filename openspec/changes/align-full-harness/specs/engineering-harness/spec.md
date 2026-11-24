@@ -38,6 +38,20 @@
 - **WHEN** 临时 PostgreSQL 初始化或在就绪前退出
 - **THEN** 生成检查返回非零退出码，并记录失败阶段、可取得的数据库原始诊断和清理结果
 
+### Requirement: 持续集成复用本地入口
+
+工程 SHALL 在 push、PR 和手动触发时执行 Windows／Ubuntu 基础检查，保存日志和测试证据。需要启动临时 PostgreSQL 的生成文档检查及数据库、浏览器回归在 Ubuntu CI 执行。
+
+#### Scenario: 自动检查失败
+
+- **WHEN** 任一 CI 检查失败
+- **THEN** 对应作业失败，并上传已产生的日志和测试报告供定位
+
+#### Scenario: 托管 Windows 基础检查
+
+- **WHEN** CI 在 GitHub 托管 Windows 上运行基础验证
+- **THEN** 执行无需启动数据库的跨平台检查，生成文档校验由同次运行的 Ubuntu 基础作业执行
+
 ## ADDED Requirements
 
 ### Requirement: 增量归档兼容性

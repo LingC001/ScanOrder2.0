@@ -68,8 +68,12 @@ jobs:
           cache: pnpm
       - name: 安装锁定依赖
         run: pnpm install --frozen-lockfile
-      - name: 执行基础验证
+      - name: 执行 Ubuntu 基础验证及生成文档校验
+        if: runner.os == 'Linux'
         run: pnpm verify
+      - name: 执行 Windows 基础验证
+        if: runner.os == 'Windows'
+        run: node scripts/harness/verify.mjs windows-ci
       - name: 保存验证日志和报告
         if: always()
         uses: actions/upload-artifact@v7
