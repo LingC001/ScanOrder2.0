@@ -30,7 +30,7 @@
         "scripts/harness/settings.json",
         "scripts/harness/workspace.mjs"
       ],
-      "reviewedDigest": "618967dd5d3becb5586853f6affeabc0d6ced0beaafa383e394f3a56f3883e21"
+      "reviewedDigest": "3075823bf8d58621ffc10b489e92483d3542ed424be7073a06a7546f95bfcafc"
     },
     "docs/PRODUCT_SENSE.md": {
       "sources": [
@@ -82,7 +82,7 @@
     },
     "docs/design-docs/core-beliefs.md": {
       "sources": ["AGENTS.md", "ARCHITECTURE.md"],
-      "reviewedDigest": "8a9a5726a2f5bb60497178eee0a9b6d9d18d8c30a47734c89c78df8f04e2a814"
+      "reviewedDigest": "e0162629f0117bc23711d4a7ccb6b94a24eaff6ec7bf002da92a800bb7929764"
     },
     "docs/design-docs/runtime-observability.md": {
       "sources": ["scripts/harness/runtime-worker.mjs", "apps/api/src/telemetry/bootstrap.ts"],
