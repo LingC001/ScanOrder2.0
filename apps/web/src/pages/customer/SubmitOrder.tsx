@@ -2,9 +2,10 @@ import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { formatMoney } from '@scanorder/contracts';
-import { api } from '../api';
-import { useCart } from '../CartProvider';
-import { Button, FoodImage, Header, Modal, Notice } from '../components';
+import { api } from '../../api';
+import { Modal } from '../../shared/Modal';
+import { useCart } from './cart/CartProvider';
+import { Button, FoodImage, Header, Notice } from './CustomerComponents';
 
 export function SubmitOrder() {
   const { state, dispatch, totals } = useCart();

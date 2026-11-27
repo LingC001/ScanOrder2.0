@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { formatMoney, ORDER_STATUS_LABELS } from '@scanorder/contracts';
-import { api } from '../api';
-import { useCustomerSession } from '../CustomerSession';
-import { FoodImage, formatTime, Header, LoadingError, Notice } from '../components';
-import { useResource } from '../useResource';
+import { api } from '../../api';
+import { formatTime } from '../../shared/formatTime';
+import { useResource } from '../../shared/useResource';
+import { FoodImage, Header, LoadingError, Notice } from './CustomerComponents';
+import { useCustomerSession } from './CustomerSession';
 
 export function OrderList() {
   const resource = useResource(api.orders);

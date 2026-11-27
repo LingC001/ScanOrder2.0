@@ -14,7 +14,7 @@ apps/api ──公开类型与金额工具──> packages/contracts
 PostgreSQL 18；本地图片存储
 ```
 
-- `apps/web`：移动点餐 H5 与响应式商家后台。[路由](apps/web/src/App.tsx)分别处理顾客会话和 `/admin`，[购物车状态](apps/web/src/CartProvider.tsx)和请求封装位于前端。前端不能引用后端源码或服务端依赖。
+- `apps/web`：移动点餐 H5 与响应式商家后台。[根路由](apps/web/src/App.tsx)分发[顾客端](apps/web/src/pages/customer/CustomerApp.tsx)和 `/admin` 商家后台，[购物车状态](apps/web/src/pages/customer/cart/CartProvider.tsx)与请求封装位于前端。前端不能引用后端源码或服务端依赖。
 - `apps/api`：NestJS HTTP 服务、身份会话、分类、菜品和订单、文件存储、显式数据库迁移及导入工具，不能引用前端源码。
 - `packages/contracts`：[公开业务类型、商家常量和纯金额工具](packages/contracts/src/index.ts)，不依赖应用或 Node.js／浏览器运行时专用 API。
 - 跨包导入使用包的公开 `exports`；禁止通过相对路径或包子路径绕过公开入口。工作区包依赖不得成环。

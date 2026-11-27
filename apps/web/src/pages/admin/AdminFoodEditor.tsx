@@ -4,7 +4,7 @@ import { ImagePlus } from 'lucide-react';
 import { formatMoney, yuanToCents } from '@scanorder/contracts';
 import type { AdminCategory, Food } from '@scanorder/contracts';
 import { api } from '../../api';
-import { Modal } from '../../components';
+import { Modal } from '../../shared/Modal';
 import { AdminMessage } from './AdminCommon';
 
 export function AdminFoodEditor({

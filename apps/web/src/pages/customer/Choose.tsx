@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDown, ClipboardList, Plus, ShoppingCart, Trash2, Utensils } from 'lucide-react';
 import { formatMoney, SHOP } from '@scanorder/contracts';
 import type { Food } from '@scanorder/contracts';
-import { api } from '../api';
-import { useCart } from '../CartProvider';
-import { FoodImage, LoadingError, Modal, Notice, Quantity } from '../components';
-import { useResource } from '../useResource';
+import { api } from '../../api';
+import { Modal } from '../../shared/Modal';
+import { useResource } from '../../shared/useResource';
+import { useCart } from './cart/CartProvider';
+import { FoodImage, LoadingError, Notice, Quantity } from './CustomerComponents';
 
 export function Choose() {
   const resource = useResource(api.foods);

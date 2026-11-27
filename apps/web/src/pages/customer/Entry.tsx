@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { SHOP } from '@scanorder/contracts';
-import { useCart } from '../CartProvider';
-import { Button } from '../components';
+import { useCart } from './cart/CartProvider';
+import { Button } from './CustomerComponents';
 
 export function Entry() {
   const { state, dispatch } = useCart();

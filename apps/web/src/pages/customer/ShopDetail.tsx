@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ChevronUp, MapPin } from 'lucide-react';
 import { SHOP } from '@scanorder/contracts';
-import { Header } from '../components';
+import { Header } from './CustomerComponents';
 
 export function ShopDetail() {
   return (

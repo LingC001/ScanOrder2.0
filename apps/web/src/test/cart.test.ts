@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Food } from '@scanorder/contracts';
-import { cartReducer, cartTotals, initialCart } from '../cart';
+import { cartReducer, cartTotals, initialCart } from '../pages/customer/cart/cart';
 
 const food: Food = {
   id: 'a',

@@ -4,22 +4,23 @@
     "docs/DESIGN.md": {
       "sources": [
         "apps/web/src/styles.css",
-        "apps/web/src/components.tsx",
+        "apps/web/src/pages/customer/CustomerComponents.tsx",
+        "apps/web/src/shared/Modal.tsx",
         "apps/web/src/pages/admin/AdminApp.tsx",
         "apps/web/src/pages/admin/AdminCommon.tsx"
       ],
-      "reviewedDigest": "12b49d555772f0fa80d87fc01128a755b7f8dd3a84d684ddb08e96cbba7bbaa2"
+      "reviewedDigest": "79cbe17f084a39318e3893ca582d2197e8ee96947816353f82050a5d398e31fb"
     },
     "docs/FRONTEND.md": {
       "sources": [
         "apps/web/src/App.tsx",
-        "apps/web/src/cart.ts",
+        "apps/web/src/pages/customer/cart/cart.ts",
         "apps/web/src/api.ts",
         "apps/web/src/pages/admin/AdminFoods.tsx",
         "apps/web/src/pages/admin/AdminCategories.tsx",
         "apps/web/src/pages/admin/AdminOrders.tsx"
       ],
-      "reviewedDigest": "183de244c4f5d8248ee8dd16ce9af38eea24d6279a1eac3be6e4aeafc3a9eada"
+      "reviewedDigest": "4fb5fd455e5111d757c25379d981681f64f899caa7ca4cf66e2631bf21b859f9"
     },
     "docs/PLANS.md": {
       "sources": [
@@ -40,7 +41,7 @@
         "apps/web/src/App.tsx",
         "apps/web/src/pages/admin/AdminApp.tsx"
       ],
-      "reviewedDigest": "c2962f5c772bc11091c71d3466a80e01f3de2e606702b5bb0a98eeab47f4cfbf"
+      "reviewedDigest": "5d00efe2177905cb2adaafaadf7473169ce1753cbed0f06b14e11068a85e2237"
     },
     "docs/QUALITY_SCORE.md": {
       "sources": [
@@ -84,11 +85,11 @@
     },
     "docs/design-docs/index.md": {
       "sources": ["ARCHITECTURE.md", "docs/design-docs/adr-template.md"],
-      "reviewedDigest": "f593374940c7e7e44d38328320bd0c4503bf2f765fb2c831af3b5c1319f8a540"
+      "reviewedDigest": "84a71d904fc400347ae89201815fff6e8ea1d27f8573a0498f29eea551d6343a"
     },
     "docs/design-docs/core-beliefs.md": {
       "sources": ["AGENTS.md", "ARCHITECTURE.md"],
-      "reviewedDigest": "7a7dd2cb9f3dea6dbbe22a4c867c93f28e07a439e5b556cb34b624a9036f9887"
+      "reviewedDigest": "a60e6b85d1a38736907410edde24f53ee63afec19f74a28fcb6fb5c048fc33c6"
     },
     "docs/design-docs/runtime-observability.md": {
       "sources": ["scripts/harness/runtime-worker.mjs", "apps/api/src/telemetry/bootstrap.ts"],
@@ -107,8 +108,12 @@
       "reviewedDigest": "63f51e730d812289ddeafb361cf94c0b18652966ce61a7b528631d500d785a82"
     },
     "docs/references/design-system-reference-llms.txt": {
-      "sources": ["apps/web/src/styles.css", "apps/web/src/components.tsx"],
-      "reviewedDigest": "c3d375192e443a7b4dceb19b7ade239d19d533ecf75f1b4344fcbd6ddb358e50"
+      "sources": [
+        "apps/web/src/styles.css",
+        "apps/web/src/pages/customer/CustomerComponents.tsx",
+        "apps/web/src/shared/Modal.tsx"
+      ],
+      "reviewedDigest": "8b78468a32bc1ddc4f0354f36446d497f968c73ddca3f7397122865db8a3b685"
     },
     "docs/references/stack-reference-llms.txt": {
       "sources": [
@@ -127,11 +132,11 @@
         "apps/api/src/import/foods-importer.ts",
         "apps/web/src/App.tsx",
         "apps/web/src/api.ts",
-        "apps/web/src/cart.ts",
+        "apps/web/src/pages/customer/cart/cart.ts",
         "packages/contracts/package.json",
         "packages/contracts/src/index.ts"
       ],
-      "reviewedDigest": "198558ba9ae817154f978e68f5ae29fa557c78097aebe869de272fd6bade5f18"
+      "reviewedDigest": "dc66ea9f54bfb78af43109c6e991980fa8cc3eb1940b03525273f29605671a79"
     }
   }
 }

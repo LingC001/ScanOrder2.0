@@ -1,6 +1,6 @@
 ScanOrder 当前设计系统参考
 
-依据为 apps/web/src/styles.css 和 apps/web/src/components.tsx；不是新引入的 UI 产品。
+依据为 apps/web/src/styles.css、apps/web/src/pages/customer/CustomerComponents.tsx 和 apps/web/src/shared/Modal.tsx；不是新引入的 UI 产品。
 
 品牌主色：#fc9904；强调色：#fd6836。
 页面背景：#eeedef；基础文字：#333。

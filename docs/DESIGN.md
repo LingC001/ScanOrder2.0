@@ -4,4 +4,4 @@ H5 延续橙色主题并在桌面宽屏居中，商家后台使用深色侧栏�
 
 设计稿还原使用内置浏览器在 localhost 对照；移动端在 375、390、430 像素检查登录、滚动、横向溢出、图片和弹层，商家后台同时检查窄屏顶部导航与桌面侧栏。当前产品样式以源码和自动截图为基线，尚未建立独立视觉回归阈值。
 
-依据：`apps/web/src/styles.css`、`apps/web/src/components.tsx`。
+依据：`apps/web/src/styles.css`、`apps/web/src/pages/customer/CustomerComponents.tsx`、`apps/web/src/shared/Modal.tsx`。

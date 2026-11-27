@@ -4,8 +4,9 @@ import { Eye, Search } from 'lucide-react';
 import { formatMoney, ORDER_STATUS_LABELS } from '@scanorder/contracts';
 import type { Order, OrderStatus } from '@scanorder/contracts';
 import { api } from '../../api';
-import { formatTime, Modal } from '../../components';
-import { useResource } from '../../useResource';
+import { formatTime } from '../../shared/formatTime';
+import { Modal } from '../../shared/Modal';
+import { useResource } from '../../shared/useResource';
 import {
   AdminMessage,
   AdminPageHeader,

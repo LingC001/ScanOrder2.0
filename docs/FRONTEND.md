@@ -1,9 +1,9 @@
 # 前端工程约定
 
-路由由 App 组合，移动点餐与 `/admin` 商家后台共享 Vite 构建。`App` 先验证顾客会话，再渲染移动路由；后台页面使用桌面侧栏和窄屏顶部导航。页面负责交互，请求集中在 api.ts，购物车由 Context 与 reducer 管理。共享业务类型和金额工具来自 contracts，不导入后端实体。
+根路由由 App 组合，移动点餐与 `/admin` 商家后台共享 Vite 构建。顾客端入口先验证会话，再渲染移动路由；后台页面使用桌面侧栏和窄屏顶部导航。顾客页面与后台页面分别位于 `src/pages/customer` 和 `src/pages/admin`，跨端组件及数据加载工具位于 `src/shared`。请求集中在 api.ts，顾客购物车由 Context 与 reducer 管理。共享业务类型和金额工具来自 contracts，不导入后端实体。
 
 购物车按菜品 UUID 区分，同名菜品不能合并；金额用整数分，数量变化后重新计算。购物车和人数只保存在内存，刷新后重置。自动测试覆盖失败保留与成功清空，设计还原另需人工视觉校验。
 
 商品页支持筛选、分页、图片表单及状态操作，分类页负责名称、排序和空分类删除，订单页负责筛选、详情和状态转换。后台长表格允许容器横向滚动，页面本身不能产生横向溢出。页面依赖组件、请求和状态层；通用组件、状态和请求层不得反向依赖页面。
 
-依据：`apps/web/src/App.tsx`、`apps/web/src/cart.ts`、`apps/web/src/api.ts`。
+依据：`apps/web/src/App.tsx`、`apps/web/src/pages/customer/cart/cart.ts`、`apps/web/src/api.ts`。

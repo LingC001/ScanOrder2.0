@@ -4,7 +4,7 @@ import { Archive, Pencil, Plus, RotateCcw, Search } from 'lucide-react';
 import { formatMoney } from '@scanorder/contracts';
 import type { Food, FoodStatus } from '@scanorder/contracts';
 import { api } from '../../api';
-import { useResource } from '../../useResource';
+import { useResource } from '../../shared/useResource';
 import {
   AdminMessage,
   AdminPageHeader,

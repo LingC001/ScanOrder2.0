@@ -3,8 +3,8 @@ import type { FormEvent } from 'react';
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { AdminCategory } from '@scanorder/contracts';
 import { api } from '../../api';
-import { Modal } from '../../components';
-import { useResource } from '../../useResource';
+import { Modal } from '../../shared/Modal';
+import { useResource } from '../../shared/useResource';
 import { AdminMessage, AdminPageHeader, EmptyState } from './AdminCommon';
 
 type Editor = { mode: 'create'; category?: undefined } | { mode: 'edit'; category: AdminCategory };

@@ -40,4 +40,4 @@ mindmap
 
 购物车和人数是页面会话内存状态，刷新后重置。初始人数为 1。固定顾客账号可跨设备查看同一账号的新订单；无归属旧订单只在商家后台显示。二维码管理、真实支付、退款和员工账号仍不在当前产品能力中。
 
-依据：`apps/web/src/App.tsx`、`apps/web/src/pages/Entry.tsx`、`apps/web/src/pages/SubmitOrder.tsx`、`tests/e2e/ordering.spec.ts`。
+依据：`apps/web/src/App.tsx`、`apps/web/src/pages/customer/Entry.tsx`、`apps/web/src/pages/customer/SubmitOrder.tsx`、`tests/e2e/ordering.spec.ts`。

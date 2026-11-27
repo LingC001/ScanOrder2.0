@@ -39,6 +39,7 @@ export function checkPolicy(directory) {
           if (
             name.startsWith('apps/web/') &&
             !name.includes('/pages/') &&
+            !name.includes('/test/') &&
             !name.endsWith('/App.tsx') &&
             /\/pages\//.test(target)
           )

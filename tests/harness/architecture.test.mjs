@@ -106,6 +106,14 @@ test('DTO 与通用前端组件不能反向依赖服务和页面', (t) => {
   );
 });
 
+test('前端测试文件可以引用被测页面', (t) => {
+  const { directory } = architectureFixture(t, {
+    'apps/web/src/pages/customer/Demo.tsx': 'export const Demo=1;',
+    'apps/web/src/test/demo.test.tsx': 'import { Demo } from "../pages/customer/Demo"; Demo;',
+  });
+  assert.deepEqual(checkArchitecture(directory), []);
+});
+
 test('业务文件超出已声明规模预算时失败', (t) => {
   const { directory } = architectureFixture(t, {
     'apps/api/src/oversize.ts': Array.from(
