@@ -47,12 +47,12 @@
         ".github/workflows/harness.yml",
         "apps/api/test/integration.test.ts",
         "apps/api/test/unit.test.ts",
-        "openspec/changes/align-full-harness/verification.md",
+        "openspec/changes/archive/2026-11-24-align-full-harness/verification.md",
         "scripts/harness/check-architecture.mjs",
         "scripts/harness/settings.json",
         "tests/e2e/ordering.spec.ts"
       ],
-      "reviewedDigest": "e0167cefc5f3a5987f420af37c956cb7a724bd83835a1bad3e626a7f7dadba2b"
+      "reviewedDigest": "4a2876f9994a5cb55fe29938ff59e1248ff5339b3a06a79f8a15e195fedcce1e"
     },
     "docs/RELIABILITY.md": {
       "sources": [
@@ -104,7 +104,7 @@
         "docs/PLANS.md",
         "docs/QUALITY_SCORE.md"
       ],
-      "reviewedDigest": "fd03b3b7345a725a8d3adaf3a6e8e4b56e2442e7d519c186e0c0dd54ecd9a235"
+      "reviewedDigest": "e96f0ad6d427648b0cfc4075ba4a1c05703db07465ee01c67d62b2e1c95bf056"
     },
     "docs/references/design-system-reference-llms.txt": {
       "sources": ["apps/web/src/styles.css", "apps/web/src/components.tsx"],
