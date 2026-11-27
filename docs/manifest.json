@@ -32,7 +32,7 @@
         "scripts/harness/settings.json",
         "scripts/harness/workspace.mjs"
       ],
-      "reviewedDigest": "8274bb9117054ffb6bb1ac28004072476be9798297cd197820bb4f6c4e9cffac"
+      "reviewedDigest": "ae207fe74dd25d2dd30923c7bcff1e5058a161058d3471a2659f8dd1263b861b"
     },
     "docs/PRODUCT_SENSE.md": {
       "sources": [
@@ -88,7 +88,7 @@
     },
     "docs/design-docs/core-beliefs.md": {
       "sources": ["AGENTS.md", "ARCHITECTURE.md"],
-      "reviewedDigest": "5a9282facf4d3e732b257850efdcac84cd443b501fa33e2937025ff2dcc98478"
+      "reviewedDigest": "7a7dd2cb9f3dea6dbbe22a4c867c93f28e07a439e5b556cb34b624a9036f9887"
     },
     "docs/design-docs/runtime-observability.md": {
       "sources": ["scripts/harness/runtime-worker.mjs", "apps/api/src/telemetry/bootstrap.ts"],
@@ -104,7 +104,7 @@
         "docs/PLANS.md",
         "docs/QUALITY_SCORE.md"
       ],
-      "reviewedDigest": "e96f0ad6d427648b0cfc4075ba4a1c05703db07465ee01c67d62b2e1c95bf056"
+      "reviewedDigest": "63f51e730d812289ddeafb361cf94c0b18652966ce61a7b528631d500d785a82"
     },
     "docs/references/design-system-reference-llms.txt": {
       "sources": ["apps/web/src/styles.css", "apps/web/src/components.tsx"],
